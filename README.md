@@ -1,7 +1,7 @@
 JoeClient
 =========
 
-![Screenshot](https://raw.githubusercontent.com/Mortis69/JoeClient/master/screenshots/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/JoeDavisson/JoeClient/master/screenshots/screenshot.png)
 
 JoeClient is a client for Naken Chat servers. It maintains a user list and saves web links and private messages in case you missed them.
 

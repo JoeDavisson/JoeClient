@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   // delay showing main gui until after all arguments are checked
   Gui::show();
 
-  Fl::add_timeout(1, Chat::read);
+  Fl::add_timeout(120, Chat::keepAlive);
   int ret = Fl::run();
   return ret;
 }

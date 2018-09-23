@@ -72,6 +72,19 @@ namespace
 
   struct user_type user_list[MAX_USERS];
 }
+static void handle_msg(size_t size);
+
+static void chat_read(int x, void *data)
+{
+        memset(buf, 0, sizeof(buf));
+        memset(temp_buf, 0, sizeof(buf));
+        memset(url_buf, 0, sizeof(buf));
+
+        int size = recv(x, temp_buf, sizeof(temp_buf), 0);
+        handle_msg(size);
+
+//        printf("%d %s\n", size, temp_buf);
+}
 
 void Chat::connect(const char *address, const int port,
                    const bool keep_alive_value)
@@ -106,7 +119,7 @@ void Chat::connect(const char *address, const int port,
     return;
   }
 
-  // convert host name to IP address  
+  // convert host name to IP address
   getnameinfo(ip_info->ai_addr, ip_info->ai_addrlen,
               ip_buf, sizeof(ip_buf), 0, 0, NI_NUMERICHOST);
 
@@ -175,6 +188,8 @@ void Chat::connect(const char *address, const int port,
 
   // send .Z for user list
   Chat::write(".Z");
+
+  Fl::add_fd(sock, FL_READ, chat_read, NULL);
 }
 
 void Chat::disconnect()
@@ -217,178 +232,137 @@ void Chat::write(const char *message)
   }
 }
 
-void Chat::read(void *data)
+static void handle_msg(size_t size)
 {
-  if(connected == true)
+  if(size > 0)
   {
-    struct timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 100000;
+    int i = 0, j = 0;
 
-    fd_set fd;
-    FD_ZERO(&fd);
-
-    if(sock != 0)
-      FD_SET(sock, &fd);
-
-    select(sock + 1, &fd, 0, 0, &tv);
-
-    if(sock != 0 && FD_ISSET(sock, &fd))
+    // remove '\r' characters
+    for(i = 0; i < size; i++)
     {
-      int size;
+      if(temp_buf[i] != '\r')
+        buf[j++] = temp_buf[i];
+    }
 
-      while(1)
+    buf[j] = '\0';
+
+    char *current = strtok(buf, "\n");
+
+    while(current != 0)
+    {
+      bool write_line = true;
+
+      // ignore @ reply from .Z
+      if(current[0] == '@')
+        write_line = false;
+
+      // check users
+      if((current[0] == '+') && (current[1] == '['))
       {
-        memset(buf, 0, sizeof(buf));
-        memset(temp_buf, 0, sizeof(buf));
-        memset(url_buf, 0, sizeof(buf));
-
-#ifdef WIN32
-        // non-blocking mode was already set in Windows
-        size = recv(sock, temp_buf, sizeof(temp_buf), 0);
-#else
-        // otherwise set non-blocking mode here
-        size = recv(sock, temp_buf, sizeof(temp_buf), MSG_DONTWAIT);
-#endif
-
-        if(size <= 0)
-          break;
-
-        if(size > 0)
+        for(i = 2; i < 10; i++)
         {
-          int i = 0, j = 0;
-
-          // remove '\r' characters
-          for(i = 0; i < size; i++)
+          if(current[i] == ']')
           {
-            if(temp_buf[i] != '\r')
-              buf[j++] = temp_buf[i];
-          }
- 
-          buf[j] = '\0';
-
-          char *current = strtok(buf, "\n");
-
-          while(current != 0)
-          {
-            bool write_line = true;
-
-            // ignore @ reply from .Z
-            if(current[0] == '@')
-              write_line = false;
-
-            // check users
-            if((current[0] == '+') && (current[1] == '['))
-            {
-              for(i = 2; i < 10; i++)
-              {
-                if(current[i] == ']')
-                {
-                  current[i] = '\0';
-                  addUser(atoi(current + 2), current + i + 1);
-                  write_line = false;
-                  break;
-                }
-              }
-            }
-
-            if((current[0] == '-') && (current[1] == '['))
-            {
-              for(i = 2; i < 10; i++)
-              {
-                if(current[i] == ']')
-                {
-                  current[i] = '\0';
-                  removeUser(atoi(current + 2));
-                  write_line = false;
-                  break;
-                }
-              }
-            }
-
-            // check for private message
-            if(current[0] == '<')
-            {
-              // stop at first carriage return
-              for(i = 0; i < strlen(current); i++)
-              {
-                if(current[i] == '\n')
-                {
-                  current[i] = '\0';
-                  break;
-                }
-              }
-
-              Gui::appendPM(current);
-            }
-
-            // check for url
-            char *url_start, *url_end;
-
-            if(((url_start = strstr(current, "http://")) != 0) ||
-               ((url_start = strstr(current, "https://")) != 0))
-            {
-              // stop at first carriage return
-              for(i = 0; i < strlen(current); i++)
-              {
-                if(current[i] == '\n')
-                {
-                  current[i] = '\0';
-                  break;
-                }
-              }
-
-              // find end of url text or stop at whitespace
-              url_end = strchr(url_start, ' ');
-
-              if(url_end == 0)
-              {
-                strcpy(url_buf, url_start);
-                Gui::appendURL(url_buf);
-              }
-              else
-              {
-                int length = url_end - url_start;
-                strncpy(url_buf, url_start, length);
-                Gui::appendURL(url_buf);
-              }
-            }
-
-            if(write_line == true)
-            {
-              Gui::append(current);
-              Gui::append("\n");
-            }
-
-            current = strtok(0, "\n");
-
-            if(current == 0)
-              break;
+            current[i] = '\0';
+            Chat::addUser(atoi(current + 2), current + i + 1);
+            write_line = false;
+            break;
           }
         }
       }
 
-      if(size == 0)
+      if((current[0] == '-') && (current[1] == '['))
       {
-        connected = false;
-        Dialog::message("Disconnected", "Connection closed by remote server.");
+        for(i = 2; i < 10; i++)
+        {
+          if(current[i] == ']')
+          {
+            current[i] = '\0';
+            Chat::removeUser(atoi(current + 2));
+            write_line = false;
+            break;
+          }
+        }
       }
+
+      // check for private message
+      if(current[0] == '<')
+      {
+        // stop at first carriage return
+        for(i = 0; i < strlen(current); i++)
+        {
+          if(current[i] == '\n')
+          {
+            current[i] = '\0';
+            break;
+          }
+        }
+
+        Gui::appendPM(current);
+      }
+
+      // check for url
+      char *url_start, *url_end;
+
+      if(((url_start = strstr(current, "http://")) != 0) ||
+         ((url_start = strstr(current, "https://")) != 0))
+      {
+        // stop at first carriage return
+        for(i = 0; i < strlen(current); i++)
+        {
+          if(current[i] == '\n')
+          {
+            current[i] = '\0';
+            break;
+          }
+        }
+
+        // find end of url text or stop at whitespace
+        url_end = strchr(url_start, ' ');
+
+        if(url_end == 0)
+        {
+          strcpy(url_buf, url_start);
+          Gui::appendURL(url_buf);
+        }
+        else
+        {
+          int length = url_end - url_start;
+          strncpy(url_buf, url_start, length);
+          Gui::appendURL(url_buf);
+        }
+      }
+
+      if(write_line == true)
+      {
+        Gui::append(current);
+        Gui::append("\n");
+      }
+
+      current = strtok(0, "\n");
+
+      if(current == 0)
+        break;
     }
+  }
+}
 
-    if(keep_alive == true)
+void Chat::keepAlive(void *data)
+{
+  if(connected && keep_alive)
+  {
+    time(&elapsed_time);
+    double seconds = difftime(elapsed_time, start_time);
+
+    if(seconds > 120)
     {
-      time(&elapsed_time);
-      double seconds = difftime(elapsed_time, start_time);
-
-      if(seconds > 120)
-      {
-        time(&start_time);
-        write("\n");
-      }
+      time(&start_time);
+      write("\n");
     }
   }
 
-  Fl::repeat_timeout(.5, Chat::read, data);
+  Fl::repeat_timeout(120, Chat::keepAlive, data);
 }
 
 void Chat::addUser(int line, const char *name)

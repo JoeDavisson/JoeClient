@@ -28,7 +28,7 @@ namespace Chat
   void connect(const char *, const int, const bool);
   void disconnect();
   void write(const char *);
-  void read(void *);
+  void keepAlive(void *);
   void addUser(int, const char *);
   void removeUser(int);
 }

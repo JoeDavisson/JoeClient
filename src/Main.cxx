@@ -19,7 +19,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
 #include "FL/Fl.H"
-//#include "FL/Fl_Timeout_Handler.H"
 
 #include "Chat.H"
 #include "Dialog.H"
@@ -27,23 +26,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 int main(int argc, char *argv[])
 {
-  // default theme
-/*
-  Fl::set_color(FL_BACKGROUND_COLOR, 80, 80, 80);
-  Fl::set_color(FL_BACKGROUND2_COLOR, 64, 64, 64);
-  Fl::set_color(FL_FOREGROUND_COLOR, 248, 248, 248);
-  Fl::set_color(FL_INACTIVE_COLOR, 128, 128, 128);
-  Fl::set_color(FL_SELECTION_COLOR, 248, 248, 248);
-*/
-//  Fl::set_color(FL_BACKGROUND_COLOR, 224, 224, 224);
-//  Fl::set_color(FL_BACKGROUND2_COLOR, 192, 192, 192);
-//  Fl::set_color(FL_FOREGROUND_COLOR, 0, 0, 0);
-//  Fl::set_color(FL_INACTIVE_COLOR, 128, 128, 128);
-//  Fl::set_color(FL_SELECTION_COLOR, 64, 64, 64);
-
   // fltk related inits
   Fl::visual(FL_DOUBLE | FL_RGB);
-//  Fl::scheme("gtk+");
 
   // program inits
   Dialog::init();
@@ -52,8 +36,6 @@ int main(int argc, char *argv[])
   // delay showing main gui until after all arguments are checked
   Gui::show();
 
-  Fl::add_timeout(120, Chat::keepAlive);
-  int ret = Fl::run();
-  return ret;
+  return Fl::run();
 }
 

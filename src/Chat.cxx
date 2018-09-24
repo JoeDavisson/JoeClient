@@ -74,16 +74,15 @@ namespace
 }
 static void handle_msg(size_t size);
 
-static void chat_read(int x, void *data)
+// Invoked by Fltk when our socket "sockfd" is readable.
+static void chat_read(int sockfd, void *data)
 {
-        memset(buf, 0, sizeof(buf));
-        memset(temp_buf, 0, sizeof(buf));
-        memset(url_buf, 0, sizeof(buf));
+  memset(buf, 0, sizeof(buf));
+  memset(temp_buf, 0, sizeof(buf));
+  memset(url_buf, 0, sizeof(buf));
 
-        int size = recv(x, temp_buf, sizeof(temp_buf), 0);
-        handle_msg(size);
-
-//        printf("%d %s\n", size, temp_buf);
+  int size = recv(sockfd, temp_buf, sizeof(temp_buf), 0);
+  handle_msg(size);
 }
 
 void Chat::connect(const char *address, const int port,
@@ -188,6 +187,9 @@ void Chat::connect(const char *address, const int port,
 
   // send .Z for user list
   Chat::write(".Z");
+
+  if (keep_alive_value)
+    Fl::add_timeout(120, Chat::keepAlive);
 
   Fl::add_fd(sock, FL_READ, chat_read, NULL);
 }

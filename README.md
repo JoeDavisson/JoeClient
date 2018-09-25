@@ -11,11 +11,22 @@ JoeClient is a client for Naken Chat servers. It maintains a user list and saves
 ```$ cd JoeClient```
 
 The Makefile supports ```linux``` and ```mingw``` cross-compiler targets.
-(Edit the Makefile to choose.)
-
-```$ make fltk```
+Typically to build locally you can just type make.
 
 ```$ make```
+
+There are some special options for building cross-compiler targets:
+
+```$ PLATFORM=mingw32 make```
+or
+```$ PLATFORM=mingw64 make```
+
+Under windows you need to set the path to the fltk libraries before building.
+Under msys this can be done by setting the following:
+
+```$ export PATH=$PATH:/drive/to/fltk-1.3.4
+   $ make```
+
 
 ## Dependencies
 

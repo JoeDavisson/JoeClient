@@ -2,18 +2,45 @@
 #
 # you MUST have libxft-dev installed before compiling FLTK on linux
 # (otherwise you'll have ugly, non-resizable fonts)
+
+# You must have fltk-config in your path. This is usually only a problem
+# when compiling on Windows.
+# You must compile with msys2 or a shell capable of executing fltk-config.
+# Typically you'll want to set the path before you begin.
+# example:
+#
+# export PATH=$PATH:/d/libs/fltk-1.3.4
+
+# Platform variables can be defined ahead of time to cross compile.
+# If not defined a best guess will be used.
 #PLATFORM=linux
 #PLATFORM=mingw32
-PLATFORM=mingw64
+#PLATFORM=mingw64
 
 NAME="JoeClient "
-#VERSION=$(shell git describe --always --dirty)
 VERSION=$(shell git describe --always)
 
 SRC_DIR=src
 INCLUDE=-I$(SRC_DIR) $(shell fltk-config --cxxflags)
 LIBS=$(shell fltk-config --use-images --ldstaticflags)
 
+# if no platform defined.
+ifeq ($(PLATFORM),)
+ifeq ($(OS),Windows_NT)
+  HOST=
+  CXX=g++
+  CXXFLAGS=-O3 -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(NAME)$(VERSION)\" $(INCLUDE)
+  LIBS+=-lgdi32 -lcomctl32 -lws2_32 -static -lpthread
+  EXE=joeclient.exe
+else
+  HOST=
+  CXX=g++
+  CXXFLAGS=-O3 -DPACKAGE_STRING=\"$(NAME)$(VERSION)\" $(INCLUDE)
+  EXE=joeclient
+endif
+endif
+
+# Overrides
 ifeq ($(PLATFORM),linux)
   HOST=
   CXX=g++

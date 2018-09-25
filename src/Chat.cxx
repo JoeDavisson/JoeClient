@@ -75,7 +75,7 @@ namespace
 static void handle_msg(size_t size);
 
 // Invoked by Fltk when our socket "sockfd" is readable.
-static void chat_read(int sockfd, void *data)
+static void chat_read(FL_SOCKET sockfd, void *data)
 {
   memset(buf, 0, sizeof(buf));
   memset(temp_buf, 0, sizeof(buf));
@@ -149,7 +149,7 @@ void Chat::connect(const char *address, const int port,
 #else
       close(sock);
 #endif
-      sock = INVALID_SOCKET;
+      sock = (int)INVALID_SOCKET;
       continue;
     }
   }

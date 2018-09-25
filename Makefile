@@ -1,8 +1,5 @@
 # JoeClient Makefile
 #
-# The fltk-1.3.3 source tree must be available in this directory.
-# Please run "make fltk" first to build the library before running "make".
-
 # you MUST have libxft-dev installed before compiling FLTK on linux
 # (otherwise you'll have ugly, non-resizable fonts)
 #PLATFORM=linux
@@ -14,8 +11,8 @@ NAME="JoeClient "
 VERSION=$(shell git describe --always)
 
 SRC_DIR=src
-INCLUDE=-I$(SRC_DIR) -Ifltk-1.3.3
-LIBS=$(shell ./fltk-1.3.3/fltk-config --use-images --ldstaticflags)
+INCLUDE=-I$(SRC_DIR) $(shell fltk-config --cxxflags)
+LIBS=$(shell fltk-config --use-images --ldstaticflags)
 
 ifeq ($(PLATFORM),linux)
   HOST=
@@ -49,14 +46,6 @@ OBJ= \
 
 default: $(OBJ)
 	$(CXX) -o ./$(EXE) $(SRC_DIR)/Main.cxx $(OBJ) $(CXXFLAGS) $(LIBS)
-
-fltk:
-	@cd ./fltk-1.3.3; \
-	make clean; \
-	./configure --host=$(HOST) --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
-	make -j20; \
-	cd ..
-	@echo "FLTK libs built!"
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.cxx $(SRC_DIR)/%.H
 	$(CXX) $(CXXFLAGS) -c $< -o $@

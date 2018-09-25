@@ -10,8 +10,6 @@ JoeClient is a client for Naken Chat servers. It maintains a user list and saves
 
 ```$ cd JoeClient```
 
-Uncompress the FLTK-1.3.3 source package here.
-
 The Makefile supports ```linux``` and ```mingw``` cross-compiler targets.
 (Edit the Makefile to choose.)
 
@@ -23,6 +21,6 @@ The Makefile supports ```linux``` and ```mingw``` cross-compiler targets.
 
 ### Libraries
 
- * FLTK-1.3.3
+ * FLTK-1.3.3 or higher.
  * libxft-dev (required for font rendering)
 

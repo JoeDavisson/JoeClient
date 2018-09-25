@@ -1,5 +1,5 @@
 before_install:
-  - sudo apt-get install -y libfltk1.3-dev libxinerama1
+  - sudo apt-get install -y libfltk1.3-dev libxinerama-dev
 
 language: cpp
 

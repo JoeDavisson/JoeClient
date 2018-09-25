@@ -24,9 +24,10 @@ or
 Under windows you need to set the path to the fltk libraries before building.
 Under msys this can be done by setting the following:
 
-```$ export PATH=$PATH:/drive/to/fltk-1.3.4
-   $ make```
-
+```
+$ export PATH=$PATH:/drive/to/fltk-1.3.4
+$ make
+```
 
 ## Dependencies
 

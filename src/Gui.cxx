@@ -144,9 +144,6 @@ void Gui::init()
   menubar = new Fl_Menu_Bar(0, 0, window->w(), 24);
   menubar->box(FL_THIN_UP_BOX);
 
-  menubar->add("&File/&Quit", 0,
-    (Fl_Callback *)quit, 0, 0);
-
   menubar->add("&Server/&Connect...", 0,
     (Fl_Callback *)Dialog::connect, 0, 0);
   menubar->add("&Server/&Disconnect", 0,
@@ -154,7 +151,10 @@ void Gui::init()
   menubar->add("&Server/Clear &Web Links", 0,
     (Fl_Callback *)clearURLs, 0, 0);
   menubar->add("&Server/&Clear &Private Messages", 0,
-    (Fl_Callback *)clearPMs, 0, 0);
+    (Fl_Callback *)clearPMs, 0, FL_MENU_DIVIDER);
+  menubar->add("&Server/&Quit", 0,
+    (Fl_Callback *)quit, 0, 0);
+
 
   menubar->add("&Preferences/&Theme/&Plain", 0,
     (Fl_Callback *)setPlainTheme, 0, FL_MENU_RADIO);

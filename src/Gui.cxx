@@ -137,7 +137,7 @@ void Gui::init()
   int pos;
 
   // main window
-  window = new MainWin(640, 480, "JoeClient");
+  window = new MainWin(800, 600, "JoeClient");
   window->callback(closeCallback);
 
   // generate menu

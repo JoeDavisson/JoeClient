@@ -183,7 +183,7 @@ void Gui::init()
   pm_text = new Fl_Text_Buffer();
 
   // bottom group
-  bottom = new Fl_Group(0, window->h() - 96, window->w(), 96);
+  bottom = new Fl_Group(0, window->h() - 144, window->w(), 144);
 
   url_display = new Fl_Help_View(bottom->x(), bottom->y(),
                                     bottom->w() / 2, bottom->h());

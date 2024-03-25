@@ -392,6 +392,7 @@ void Gui::clearPMs()
 
 void Gui::linkColor()
 {
+return;
   // remove first line
   url_text->remove(url_text->line_start(1),
                    url_text->line_end(1) + 1);
@@ -424,7 +425,7 @@ void Gui::setPlainTheme()
   Fl::set_color(FL_SELECTION_COLOR, 64, 64, 64);
   input_field->color(fl_rgb_color(208, 208, 208));
   Dialog::setButtonColor(fl_rgb_color(192, 192, 192));
-  strcpy(url_color, "#000000");
+  strncpy(url_color, "#000000", sizeof(url_color));
   linkColor();
   Fl::scheme("none");
   getWindow()->redraw();
@@ -439,7 +440,7 @@ void Gui::setGtkLightTheme()
   Fl::set_color(FL_SELECTION_COLOR, 80, 80, 80);
   input_field->color(fl_rgb_color(176, 176, 176));
   Dialog::setButtonColor(fl_rgb_color(192, 192, 192));
-  strcpy(url_color, "#000000");
+  strncpy(url_color, "#000000", sizeof(url_color));
   linkColor();
   Fl::scheme("gtk+");
   getWindow()->redraw();
@@ -454,7 +455,7 @@ void Gui::setGtkDarkTheme()
   Fl::set_color(FL_SELECTION_COLOR, 224, 224, 224);
   input_field->color(fl_rgb_color(56, 56, 56));
   Dialog::setButtonColor(fl_rgb_color(96, 96, 96));
-  strcpy(url_color, "#ffffff");
+  strncpy(url_color, "#ffffff", sizeof(url_color));
   linkColor();
   Fl::scheme("gtk+");
   getWindow()->redraw();
@@ -469,7 +470,7 @@ void Gui::setAquaTheme()
   Fl::set_color(FL_SELECTION_COLOR, 255, 255, 255);
   input_field->color(fl_rgb_color(208, 208, 208));
   Dialog::setButtonColor(fl_rgb_color(255, 255, 255));
-  strcpy(url_color, "#000000");
+  strncpy(url_color, "#000000", sizeof(url_color));
   linkColor();
   Fl::scheme("plastic");
   getWindow()->redraw();

@@ -20,12 +20,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 #include "FL/Fl.H"
 
+#include <csignal>
+
 #include "Chat.H"
 #include "Dialog.H"
 #include "Gui.H"
 
 int main(int argc, char *argv[])
 {
+  // ignore SIGPIPE
+  signal(SIGPIPE, SIG_IGN);
+
   // fltk related inits
   Fl::visual(FL_DOUBLE | FL_RGB);
 

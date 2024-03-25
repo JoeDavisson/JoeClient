@@ -20,7 +20,7 @@ LIBS=$(shell ./fltk-1.3.7/fltk-config --use-images --ldstaticflags)
 ifeq ($(PLATFORM),linux)
   HOST=
   CXX=g++
-  CXXFLAGS= -O3 -Wall -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
+  CXXFLAGS= -g -O3 -Wall -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
   EXE=joeclient
 endif
 
@@ -50,7 +50,7 @@ OBJ= \
 default: $(OBJ)
 	$(CXX) -o ./$(EXE) $(SRC_DIR)/Main.cxx $(OBJ) $(CXXFLAGS) $(LIBS)
 
-fltk:
+fltklib:
 	@cd ./fltk-1.3.7; \
 	make clean; \
 	./configure --host=$(HOST) --enable-xft --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \

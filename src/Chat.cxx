@@ -54,10 +54,10 @@ namespace
   struct addrinfo *ip_info;
   struct addrinfo hints;
 
-  char buf[1024];
-  char ip_buf[1024];
-  char url_buf[2048];
-  char temp_buf[1024];
+  char buf[4096];
+  char ip_buf[4096];
+  char url_buf[4096];
+  char temp_buf[4096];
 
   bool connected = false;
   bool keep_alive = false;
@@ -196,8 +196,8 @@ void Chat::connectToServer(const char *address, const int port,
 
 void Chat::disconnect()
 {
-  if(connected == true)
-  {
+//  if(connected == true)
+//  {
 #ifdef WIN32
     closesocket(sock);
     WSACleanup();
@@ -207,7 +207,7 @@ void Chat::disconnect()
 
     connected = false;
     Dialog::message("Disconnected", "Connection Closed");
-  }
+//  }
 }
 
 void Chat::write(const char *message)
@@ -323,17 +323,12 @@ static void handle_msg(size_t size)
         // find end of url text or stop at whitespace
         url_end = strchr(url_start, ' ');
 
-        if(url_end == 0)
-        {
-          strcpy(url_buf, url_start);
-          Gui::appendURL(url_buf);
-        }
-        else
-        {
-          int length = url_end - url_start;
-          strncpy(url_buf, url_start, length);
-          Gui::appendURL(url_buf);
-        }
+        if (url_end == 0)
+          url_end = strchr(url_start, '\0');
+
+        const int length = url_end - url_start;
+        strncpy(url_buf, url_start, length);
+        Gui::appendURL(url_buf);
       }
 
       if(write_line == true)
@@ -371,7 +366,7 @@ void Chat::addUser(int line, const char *name)
 {
   if(line >= 0 && line < MAX_USERS)
   {
-    strcpy(user_list[line].name, name);
+    strncpy(user_list[line].name, name, sizeof(user_list[line].name));
     user_list[line].active = true;
 
     Gui::clearUsers();

@@ -54,10 +54,10 @@ namespace
   struct addrinfo *ip_info;
   struct addrinfo hints;
 
-  char buf[4096];
-  char ip_buf[4096];
-  char url_buf[4096];
-  char temp_buf[4096];
+  char buf[1024];
+  char ip_buf[1024];
+  char url_buf[2048];
+  char temp_buf[1024];
 
   bool connected = false;
   bool keep_alive = false;
@@ -71,17 +71,131 @@ namespace
   };
 
   struct user_type user_list[MAX_USERS];
-}
-static void handle_msg(size_t size);
 
-static void chat_read(FL_SOCKET sockfd, void *data)
-{
-  memset(buf, 0, sizeof(buf));
-  memset(temp_buf, 0, sizeof(buf));
-  memset(url_buf, 0, sizeof(buf));
+  void handle_msg(size_t size)
+  {
+    if(size > 0)
+    {
+      size_t i = 0, j = 0;
 
-  int size = recv(sockfd, temp_buf, sizeof(temp_buf), 0);
-  handle_msg(size);
+      // remove '\r' characters
+      for(i = 0; i < size; i++)
+      {
+        if(temp_buf[i] != '\r')
+          buf[j++] = temp_buf[i];
+      }
+
+      buf[j] = '\0';
+
+      char *current = strtok(buf, "\n");
+
+      while(current != 0)
+      {
+        bool write_line = true;
+
+        // ignore @ reply from .Z
+        if(current[0] == '@')
+          write_line = false;
+
+        // check users
+        if((current[0] == '+') && (current[1] == '['))
+        {
+          for(i = 2; i < 10; i++)
+          {
+            if(current[i] == ']')
+            {
+              current[i] = '\0';
+              Chat::addUser(atoi(current + 2), current + i + 1);
+              write_line = false;
+              break;
+            }
+          }
+        }
+
+        if((current[0] == '-') && (current[1] == '['))
+        {
+          for(i = 2; i < 10; i++)
+          {
+            if(current[i] == ']')
+            {
+              current[i] = '\0';
+              Chat::removeUser(atoi(current + 2));
+              write_line = false;
+              break;
+            }
+          }
+        }
+
+        // check for private message
+        if(current[0] == '<')
+        {
+          // stop at first carriage return
+          for(i = 0; i < strlen(current); i++)
+          {
+            if(current[i] == '\n')
+            {
+              current[i] = '\0';
+              break;
+            }
+          }
+
+          Gui::appendPM(current);
+        }
+
+        // check for url
+        char *url_start, *url_end;
+
+        if(((url_start = strstr(current, "http://")) != 0) ||
+           ((url_start = strstr(current, "https://")) != 0))
+        {
+          // stop at first carriage return
+          for(i = 0; i < strlen(current); i++)
+          {
+            if(current[i] == '\n')
+            {
+              current[i] = '\0';
+              break;
+            }
+          }
+
+          // find end of url text or stop at whitespace
+          url_end = strchr(url_start, ' ');
+
+          if (url_end == 0)
+            url_end = strchr(url_start, '\0');
+
+          const int length = url_end - url_start;
+          strncpy(url_buf, url_start, length);
+          Gui::appendURL(url_buf);
+        }
+
+        if(write_line == true)
+        {
+          Gui::append(current);
+          Gui::append("\n");
+        }
+
+        current = strtok(0, "\n");
+
+        if(current == 0)
+          break;
+      }
+    }
+    else
+    {
+      Chat::disconnect();
+    }
+  }
+
+  void chat_read(FL_SOCKET sockfd, void *data)
+  {
+    memset(buf, 0, sizeof(buf));
+    memset(temp_buf, 0, sizeof(buf));
+    memset(url_buf, 0, sizeof(buf));
+
+    int size = recv(sockfd, temp_buf, sizeof(temp_buf), 0);
+    handle_msg(size);
+  }
 }
 
 void Chat::connectToServer(const char *address, const int port,
@@ -195,8 +309,8 @@ void Chat::connectToServer(const char *address, const int port,
 
 void Chat::disconnect()
 {
-//  if(connected == true)
-//  {
+  if(connected == true)
+  {
 #ifdef WIN32
     closesocket(sock);
     WSACleanup();
@@ -206,7 +320,7 @@ void Chat::disconnect()
 
     connected = false;
     Dialog::message("Disconnected", "Connection Closed");
-//  }
+  }
 }
 
 void Chat::write(const char *message)
@@ -227,119 +341,8 @@ void Chat::write(const char *message)
 
     if(sock != 0 && FD_ISSET(sock, &fd))
     {
-      send(sock, message, strlen(message), 0);  
-      send(sock, "\n", 1, 0);  
-    }
-  }
-}
-
-static void handle_msg(size_t size)
-{
-  if(size > 0)
-  {
-    size_t i = 0, j = 0;
-
-    // remove '\r' characters
-    for(i = 0; i < size; i++)
-    {
-      if(temp_buf[i] != '\r')
-        buf[j++] = temp_buf[i];
-    }
-
-    buf[j] = '\0';
-
-    char *current = strtok(buf, "\n");
-
-    while(current != 0)
-    {
-      bool write_line = true;
-
-      // ignore @ reply from .Z
-      if(current[0] == '@')
-        write_line = false;
-
-      // check users
-      if((current[0] == '+') && (current[1] == '['))
-      {
-        for(i = 2; i < 10; i++)
-        {
-          if(current[i] == ']')
-          {
-            current[i] = '\0';
-            Chat::addUser(atoi(current + 2), current + i + 1);
-            write_line = false;
-            break;
-          }
-        }
-      }
-
-      if((current[0] == '-') && (current[1] == '['))
-      {
-        for(i = 2; i < 10; i++)
-        {
-          if(current[i] == ']')
-          {
-            current[i] = '\0';
-            Chat::removeUser(atoi(current + 2));
-            write_line = false;
-            break;
-          }
-        }
-      }
-
-      // check for private message
-      if(current[0] == '<')
-      {
-        // stop at first carriage return
-        for(i = 0; i < strlen(current); i++)
-        {
-          if(current[i] == '\n')
-          {
-            current[i] = '\0';
-            break;
-          }
-        }
-
-        Gui::appendPM(current);
-      }
-
-      // check for url
-      char *url_start, *url_end;
-
-      if(((url_start = strstr(current, "http://")) != 0) ||
-         ((url_start = strstr(current, "https://")) != 0))
-      {
-        // stop at first carriage return
-        for(i = 0; i < strlen(current); i++)
-        {
-          if(current[i] == '\n')
-          {
-            current[i] = '\0';
-            break;
-          }
-        }
-
-        // find end of url text or stop at whitespace
-        url_end = strchr(url_start, ' ');
-
-        if (url_end == 0)
-          url_end = strchr(url_start, '\0');
-
-        const int length = url_end - url_start;
-        strncpy(url_buf, url_start, length);
-        Gui::appendURL(url_buf);
-      }
-
-      if(write_line == true)
-      {
-        Gui::append(current);
-        Gui::append("\n");
-      }
-
-      current = strtok(0, "\n");
-
-      if(current == 0)
-        break;
+      send(sock, message, strlen(message), 0);
+      send(sock, "\n", 1, 0);
     }
   }
 }

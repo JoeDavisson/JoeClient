@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015 Joe Davisson.
+Copyright (c) 2024 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -17,8 +17,6 @@ You should have received a copy of the GNU General Public License
 along with JoeClient; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
-
-#include <algorithm>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>
@@ -67,7 +65,6 @@ namespace About
   void init()
   {
     int y1 = 8;
-    int ww = 0, hh = 0;
 
     Items::dialog = new DialogWindow(384, 0, "About");
     Items::title = new Fl_Box(FL_NO_BOX, 0, 8, 384, 32, "JoeClient");
@@ -76,7 +73,7 @@ namespace About
     Items::title->labelfont(FL_HELVETICA_BOLD);
     y1 += 48;
     Items::copyright = new Fl_Box(FL_FLAT_BOX, 0, y1, 384, 32,
-                                  "Copyright (c) 2016 Joe Davisson");
+                                  "Copyright (c) 2024 Joe Davisson");
     Items::copyright->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
     Items::copyright->labelsize(14);
     y1 += 24;
@@ -115,8 +112,8 @@ namespace Connect
   void close()
   {
     Items::dialog->hide();
-    Chat::connect(Items::address->value(), atoi(Items::port->value()),
-                  Items::keep_alive->value());
+    Chat::connectToServer(Items::address->value(), atoi(Items::port->value()),
+                          Items::keep_alive->value());
   }
 
   void quit()
@@ -127,7 +124,6 @@ namespace Connect
   void init()
   {
     int y1 = 8;
-    int ww = 0, hh = 0;
 
     Items::dialog = new DialogWindow(384, 0, "Connect to Server");
     Items::address = new Fl_Input(88, y1, 128, 24, "Address: ");
@@ -254,7 +250,7 @@ void Dialog::about()
   About::begin();
 }
 
-void Dialog::connect()
+void Dialog::connectToServer()
 {
   Connect::begin();
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015 Joe Davisson.
+Copyright (c) 2024 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -66,7 +66,7 @@ namespace
 
   struct user_type
   {
-    char name[32];
+    char name[256];
     bool active;
   };
 
@@ -85,8 +85,8 @@ static void chat_read(FL_SOCKET sockfd, void *data)
   handle_msg(size);
 }
 
-void Chat::connect(const char *address, const int port,
-                   const bool keep_alive_value)
+void Chat::connectToServer(const char *address, const int port,
+                           const bool keep_alive_value)
 {
   if(connected == true)
   {
@@ -181,7 +181,7 @@ void Chat::connect(const char *address, const int port,
 
   // announcement
   char connect_string[256];
-  sprintf(connect_string, "%c has connected using JoeClient", 0x25);
+  snprintf(connect_string, sizeof(connect_string), "%c has connected using JoeClient", 0x25);
 
   Chat::write(connect_string);
 
@@ -238,7 +238,7 @@ static void handle_msg(size_t size)
 {
   if(size > 0)
   {
-    int i = 0, j = 0;
+    size_t i = 0, j = 0;
 
     // remove '\r' characters
     for(i = 0; i < size; i++)

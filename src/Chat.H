@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015 Joe Davisson.
+Copyright (c) 2024 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -23,15 +23,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 #include <sys/types.h>
 
-namespace Chat
+class Chat
 {
-  void connect(const char *, const int, const bool);
-  void disconnect();
-  void write(const char *);
-  void keepAlive(void *);
-  void addUser(int, const char *);
-  void removeUser(int);
-}
+public:
+  static void connectToServer(const char *, const int, const bool);
+  static void disconnect();
+  static void write(const char *);
+  static void keepAlive(void *);
+  static void addUser(int, const char *);
+  static void removeUser(int);
+
+private:
+  Chat() { }
+  ~Chat() { }
+};
 
 #endif
 

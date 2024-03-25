@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015 Joe Davisson.
+Copyright (c) 2024 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -24,31 +24,36 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 class Fl_Double_Window;
 class Fl_Menu_Bar;
 
-namespace Gui
+class Gui
 {
-  void init();
-  void show();
-  void setMenuItem(const char *);
-  void clearMenuItem(const char *);
-  Fl_Double_Window *getWindow();
-  Fl_Menu_Bar *getMenuBar();
-  void append(const char *);
-  void appendUser(int, const char *);
-  void appendURL(const char *);
-  void appendPM(const char *);
-  void clearUsers();
-  void clearURLs();
-  void clearPMs();
-  void linkColor();
-  void sendMessage();
-  void setPlainTheme();
-  void setGtkLightTheme();
-  void setGtkDarkTheme();
-  void setAquaTheme();
-  void setFontSmall();
-  void setFontMedium();
-  void setFontLarge();
-}
+public:
+  static void init();
+  static void show();
+  static void setMenuItem(const char *);
+  static void clearMenuItem(const char *);
+  static Fl_Double_Window *getWindow();
+  static Fl_Menu_Bar *getMenuBar();
+  static void append(const char *);
+  static void appendUser(int, const char *);
+  static void appendURL(const char *);
+  static void appendPM(const char *);
+  static void clearUsers();
+  static void clearURLs();
+  static void clearPMs();
+  static void linkColor();
+  static void sendMessage();
+  static void setPlainTheme();
+  static void setGtkLightTheme();
+  static void setGtkDarkTheme();
+  static void setAquaTheme();
+  static void setFontSmall();
+  static void setFontMedium();
+  static void setFontLarge();
+
+private:
+  Gui() { }
+  ~Gui() { }
+};
 
 #endif
 

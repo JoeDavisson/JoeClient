@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015 Joe Davisson.
+Copyright (c) 2024 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -21,15 +21,20 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #ifndef DIALOG_H
 #define DIALOG_H
 
-namespace Dialog
+class Dialog
 {
-  void init();
-  void about();
-  void connect();
-  void message(const char *, const char *);
-  bool choice(const char *, const char *);
-  void setButtonColor(Fl_Color);
-}
+public:
+  static void init();
+  static void about();
+  static void connectToServer();
+  static void message(const char *, const char *);
+  static bool choice(const char *, const char *);
+  static void setButtonColor(Fl_Color);
+
+private:
+  Dialog() { }
+  ~Dialog() { }
+};
 
 #endif
 

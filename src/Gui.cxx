@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2015 Joe Davisson.
+Copyright (c) 2024 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -100,7 +100,7 @@ public:
   
   int handle(int event)
   {
-    bool shift, ctrl;
+    // bool shift = false, ctrl = false;
 
     switch(event)
     {
@@ -116,8 +116,8 @@ public:
           return 0;
         }
 
-        shift = Fl::event_shift() ? true : false;
-        ctrl = Fl::event_ctrl() ? true : false;
+        // shift = Fl::event_shift() ? true : false;
+        // ctrl = Fl::event_ctrl() ? true : false;
 
         // misc keys
         //switch(Fl::event_key())
@@ -134,8 +134,6 @@ public:
 // initialize main gui
 void Gui::init()
 {
-  int pos;
-
   // main window
   window = new MainWin(800, 600, "JoeClient");
   window->callback(closeCallback);
@@ -145,7 +143,7 @@ void Gui::init()
   menubar->box(FL_THIN_UP_BOX);
 
   menubar->add("&Server/&Connect...", 0,
-    (Fl_Callback *)Dialog::connect, 0, 0);
+    (Fl_Callback *)Dialog::connectToServer, 0, 0);
   menubar->add("&Server/&Disconnect", 0,
     (Fl_Callback *)Chat::disconnect, 0, FL_MENU_DIVIDER);
   menubar->add("&Server/Clear &Web Links", 0,
@@ -186,14 +184,12 @@ void Gui::init()
   bottom = new Fl_Group(0, window->h() - 144, window->w(), 144);
 
   url_display = new Fl_Help_View(bottom->x(), bottom->y(),
-                                    bottom->w() / 2, bottom->h());
+                                 bottom->w() / 2, bottom->h());
   url_display->box(FL_UP_BOX);
   url_display->textsize(14);
-//  url_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-//  url_display->buffer(url_text);
 
   pm_display = new Fl_Text_Display(bottom->x() + bottom->w() / 2, bottom->y(),
-                                    bottom->w() / 2, bottom->h());
+                                   bottom->w() / 2, bottom->h());
   pm_display->box(FL_UP_BOX);
   pm_display->textsize(14);
   pm_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
@@ -309,7 +305,7 @@ void Gui::appendUser(int line, const char *name)
 {
   char buf[32];
 
-  sprintf(buf, "[%d] %s", line, name);
+  snprintf(buf, sizeof(buf), "[%d] %s", line, name);
   user_text->append(buf); 
 
   if(name[strlen(buf) - 1] != '\n')
@@ -344,7 +340,7 @@ void Gui::appendURL(const char *text)
   int lines = url_text->count_lines(0, url_text->length());
 
   // limit scrollback buffer to 50 lines
-  while(lines > 50 - 1)
+  while(lines > 50)
   {
     url_text->remove(url_text->line_start(1),
                      url_text->line_end(1) + 1);
@@ -354,8 +350,6 @@ void Gui::appendURL(const char *text)
   // scroll display to bottom
   url_display->value(url_text->text());
   linkColor();
-//  url_display->insert_position(url_text->length());
-//  url_display->show_insert_position();
 }
 
 void Gui::appendPM(const char *text)

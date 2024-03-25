@@ -74,7 +74,6 @@ namespace
 }
 static void handle_msg(size_t size);
 
-// Invoked by Fltk when our socket "sockfd" is readable.
 static void chat_read(FL_SOCKET sockfd, void *data)
 {
   memset(buf, 0, sizeof(buf));

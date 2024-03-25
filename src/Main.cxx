@@ -28,8 +28,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 int main(int argc, char *argv[])
 {
+#ifndef WIN32
   // ignore SIGPIPE
   signal(SIGPIPE, SIG_IGN);
+#endif
 
   // fltk related inits
   Fl::visual(FL_DOUBLE | FL_RGB);

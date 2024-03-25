@@ -20,7 +20,7 @@ LIBS=$(shell ./fltk-1.3.7/fltk-config --use-images --ldstaticflags)
 ifeq ($(PLATFORM),linux)
   HOST=
   CXX=g++
-  CXXFLAGS= -g -O3 -Wall -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
+  CXXFLAGS= -O3 -Wall -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
   EXE=joeclient
 endif
 

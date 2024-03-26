@@ -65,21 +65,21 @@ namespace
   // quit program
   void quit()
   {
-    if(Dialog::choice("Quit", "Are You Sure?"))
+    if (Dialog::choice("Quit", "Are You Sure?"))
       exit(0);
   }
 
   // prevent escape from closing main window
   void closeCallback(Fl_Widget *widget, void *)
   {
-    if((Fl::event() == FL_KEYDOWN || Fl::event() == FL_SHORTCUT)
+    if ((Fl::event() == FL_KEYDOWN || Fl::event() == FL_SHORTCUT)
        && Fl::event_key() == FL_Escape)
     {
       return;
     }
-    else
+      else
     {
-      if(Dialog::choice("Quit", "Are You Sure?"))
+      if (Dialog::choice("Quit", "Are You Sure?"))
         widget->hide();
     }
   }
@@ -89,20 +89,14 @@ namespace
 class MainWin : public Fl_Double_Window
 {
 public:
-  MainWin(int w, int h, const char *label)
-  : Fl_Double_Window(w, h, label)
-  {
-  }
-
-  ~MainWin()
-  {
-  }
+  MainWin(int w, int h, const char *label) : Fl_Double_Window(w, h, label) { }
+  ~MainWin() { }
   
   int handle(int event)
   {
     // bool shift = false, ctrl = false;
 
-    switch(event)
+    switch (event)
     {
       case FL_FOCUS:
         return 1;
@@ -110,7 +104,7 @@ public:
         return 1;
       case FL_KEYBOARD:
         // give focus to the main menu
-        if(Fl::event_alt() > 0)
+        if (Fl::event_alt() > 0)
         {
           Gui::getMenuBar()->take_focus();
           return 0;
@@ -120,7 +114,7 @@ public:
         // ctrl = Fl::event_ctrl() ? true : false;
 
         // misc keys
-        //switch(Fl::event_key())
+        //switch (Fl::event_key())
         //{
         //}
 
@@ -241,7 +235,7 @@ void Gui::init()
   clearURLs();
 
   // fix certain icons if using a light theme
-  //if(Project::theme == Project::THEME_LIGHT)
+  //if (Project::theme == Project::THEME_LIGHT)
   //{
   //}
 }
@@ -258,7 +252,7 @@ void Gui::setMenuItem(const char *s)
   Fl_Menu_Item *m;
   m = (Fl_Menu_Item *)menubar->find_item(s);
 
-  if(m)
+  if (m)
     m->set();
 }
 
@@ -268,7 +262,7 @@ void Gui::clearMenuItem(const char *s)
   Fl_Menu_Item *m;
   m = (Fl_Menu_Item *)menubar->find_item(s);
 
-  if(m)
+  if (m)
     m->clear();
 }
 
@@ -289,7 +283,7 @@ void Gui::append(const char *text)
   int lines = server_text->count_lines(0, server_text->length());
 
   // limit scrollback buffer to 1000 lines
-  while(lines > 1000)
+  while (lines > 1000)
   {
     server_text->remove(server_text->line_start(1),
                         server_text->line_end(1) + 1);
@@ -308,13 +302,13 @@ void Gui::appendUser(int line, const char *name)
   snprintf(buf, sizeof(buf), "[%d] %s", line, name);
   user_text->append(buf); 
 
-  if(name[strlen(buf) - 1] != '\n')
+  if (name[strlen(buf) - 1] != '\n')
     user_text->append("\n"); 
 
   int lines = user_text->count_lines(0, user_text->length());
 
   // limit scrollback buffer to 100 lines
-  while(lines > 50)
+  while (lines > 50)
   {
     user_text->remove(user_text->line_start(1),
                       user_text->line_end(1) + 1);
@@ -334,13 +328,10 @@ void Gui::appendURL(const char *text)
   url_text->append(text); 
   url_text->append("</a><br>\n"); 
 
-//  if(text[strlen(text) - 1] != '\n')
-//    url_text->append("\n"); 
-
   int lines = url_text->count_lines(0, url_text->length());
 
   // limit scrollback buffer to 50 lines
-  while(lines > 50)
+  while (lines > 50)
   {
     url_text->remove(url_text->line_start(1),
                      url_text->line_end(1) + 1);
@@ -356,13 +347,13 @@ void Gui::appendPM(const char *text)
 {
   pm_text->append(text); 
 
-  if(text[strlen(text) - 1] != '\n')
+  if (text[strlen(text) - 1] != '\n')
     pm_text->append("\n"); 
 
   int lines = pm_text->count_lines(0, pm_text->length());
 
   // limit scrollback buffer to 100 lines
-  while(lines > 100)
+  while (lines > 100)
   {
     pm_text->remove(pm_text->line_start(1),
                     pm_text->line_end(1) + 1);

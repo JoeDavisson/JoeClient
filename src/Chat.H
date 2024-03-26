@@ -36,7 +36,6 @@ public:
 private:
   Chat() { }
   ~Chat() { }
-
 };
 
 #endif

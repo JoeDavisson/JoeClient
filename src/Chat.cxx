@@ -74,14 +74,14 @@ namespace
 
   void handle_msg(size_t size)
   {
-    if(size > 0)
+    if (size > 0)
     {
       size_t i = 0, j = 0;
 
       // remove '\r' characters
-      for(i = 0; i < size; i++)
+      for (i = 0; i < size; i++)
       {
-        if(temp_buf[i] != '\r')
+        if (temp_buf[i] != '\r')
           buf[j++] = temp_buf[i];
       }
 
@@ -89,20 +89,20 @@ namespace
 
       char *current = strtok(buf, "\n");
 
-      while(current != 0)
+      while (current != 0)
       {
         bool write_line = true;
 
         // ignore @ reply from .Z
-        if(current[0] == '@')
+        if (current[0] == '@')
           write_line = false;
 
         // check users
-        if((current[0] == '+') && (current[1] == '['))
+        if ((current[0] == '+') && (current[1] == '['))
         {
-          for(i = 2; i < 10; i++)
+          for (i = 2; i < 10; i++)
           {
-            if(current[i] == ']')
+            if (current[i] == ']')
             {
               current[i] = '\0';
               Chat::addUser(atoi(current + 2), current + i + 1);
@@ -112,11 +112,11 @@ namespace
           }
         }
 
-        if((current[0] == '-') && (current[1] == '['))
+        if ((current[0] == '-') && (current[1] == '['))
         {
-          for(i = 2; i < 10; i++)
+          for (i = 2; i < 10; i++)
           {
-            if(current[i] == ']')
+            if (current[i] == ']')
             {
               current[i] = '\0';
               Chat::removeUser(atoi(current + 2));
@@ -127,12 +127,12 @@ namespace
         }
 
         // check for private message
-        if(current[0] == '<')
+        if (current[0] == '<')
         {
           // stop at first carriage return
-          for(i = 0; i < strlen(current); i++)
+          for (i = 0; i < strlen(current); i++)
           {
-            if(current[i] == '\n')
+            if (current[i] == '\n')
             {
               current[i] = '\0';
               break;
@@ -145,13 +145,13 @@ namespace
         // check for url
         char *url_start, *url_end;
 
-        if(((url_start = strstr(current, "http://")) != 0) ||
+        if (((url_start = strstr(current, "http://")) != 0) ||
            ((url_start = strstr(current, "https://")) != 0))
         {
           // stop at first carriage return
-          for(i = 0; i < strlen(current); i++)
+          for (i = 0; i < strlen(current); i++)
           {
-            if(current[i] == '\n')
+            if (current[i] == '\n')
             {
               current[i] = '\0';
               break;
@@ -169,7 +169,7 @@ namespace
           Gui::appendURL(url_buf);
         }
 
-        if(write_line == true)
+        if (write_line == true)
         {
           Gui::append(current);
           Gui::append("\n");
@@ -177,11 +177,11 @@ namespace
 
         current = strtok(0, "\n");
 
-        if(current == 0)
+        if (current == 0)
           break;
       }
     }
-    else
+      else
     {
       Chat::disconnect();
     }
@@ -201,17 +201,17 @@ namespace
 void Chat::connectToServer(const char *address, const int port,
                            const bool keep_alive_value)
 {
-  if(connected == true)
+  if (connected == true)
   {
     Dialog::message("Error", "Already connected to a server.");
     return;
   }
 
-  for(int i = 0; i < MAX_USERS; i++)
+  for (int i = 0; i < MAX_USERS; i++)
     user_list[i].active = false;
 
 #ifdef WIN32
-  if(WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
+  if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
   {
     Dialog::message("Error", "Could not initialize Winsock.");
     return;
@@ -222,7 +222,7 @@ void Chat::connectToServer(const char *address, const int port,
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = IPPROTO_TCP;
 
-  if(getaddrinfo(address, 0, &hints, &ip_info) != 0)
+  if (getaddrinfo(address, 0, &hints, &ip_info) != 0)
   {
 #ifdef WIN32
       WSACleanup();
@@ -241,11 +241,11 @@ void Chat::connectToServer(const char *address, const int port,
 
   struct addrinfo *p;
 
-  for(p = ip_info; p != NULL; p = p->ai_next)
+  for (p = ip_info; p != NULL; p = p->ai_next)
   {
     sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 
-    if(sock == INVALID_SOCKET)
+    if (sock == INVALID_SOCKET)
     {
       Dialog::message("Error", "Could not open socket.");
 #ifdef WIN32
@@ -254,7 +254,7 @@ void Chat::connectToServer(const char *address, const int port,
       return;
     }
 
-    if(connect(sock, (struct sockaddr *)&server,
+    if (connect(sock, (struct sockaddr *)&server,
                sizeof(server)) == SOCKET_ERROR)
     {
 #ifdef WIN32
@@ -267,7 +267,7 @@ void Chat::connectToServer(const char *address, const int port,
     }
   }
 
-  if(sock == INVALID_SOCKET)
+  if (sock == INVALID_SOCKET)
   {
 #ifdef WIN32
       WSACleanup();
@@ -280,7 +280,7 @@ void Chat::connectToServer(const char *address, const int port,
 #ifdef WIN32
   u_long mode = 1;
 
-  if(ioctlsocket(sock, FIONBIO, &mode) != NO_ERROR)
+  if (ioctlsocket(sock, FIONBIO, &mode) != NO_ERROR)
   {
     WSACleanup();
     Dialog::message("Error", "Could not set socket to non-blocking mode.");
@@ -309,7 +309,7 @@ void Chat::connectToServer(const char *address, const int port,
 
 void Chat::disconnect()
 {
-  if(connected == true)
+  if (connected == true)
   {
 #ifdef WIN32
     closesocket(sock);
@@ -325,7 +325,7 @@ void Chat::disconnect()
 
 void Chat::write(const char *message)
 {
-  if(connected == true)
+  if (connected == true)
   {
     struct timeval tv;
     tv.tv_sec = 0;
@@ -334,12 +334,12 @@ void Chat::write(const char *message)
     fd_set fd;
     FD_ZERO(&fd);
 
-    if(sock != 0)
+    if (sock != 0)
       FD_SET(sock, &fd);
 
     select(sock + 1, 0, &fd, 0, &tv);
 
-    if(sock != 0 && FD_ISSET(sock, &fd))
+    if (sock != 0 && FD_ISSET(sock, &fd))
     {
       send(sock, message, strlen(message), 0);
       send(sock, "\n", 1, 0);
@@ -349,12 +349,12 @@ void Chat::write(const char *message)
 
 void Chat::keepAlive(void *data)
 {
-  if(connected && keep_alive)
+  if (connected && keep_alive)
   {
     time(&elapsed_time);
     double seconds = difftime(elapsed_time, start_time);
 
-    if(seconds > 120)
+    if (seconds > 120)
     {
       time(&start_time);
       write("\n");
@@ -366,16 +366,16 @@ void Chat::keepAlive(void *data)
 
 void Chat::addUser(int line, const char *name)
 {
-  if(line >= 0 && line < MAX_USERS)
+  if (line >= 0 && line < MAX_USERS)
   {
     strncpy(user_list[line].name, name, sizeof(user_list[line].name));
     user_list[line].active = true;
 
     Gui::clearUsers();
 
-    for(int i = 0; i < MAX_USERS; i++)
+    for (int i = 0; i < MAX_USERS; i++)
     {
-      if(user_list[i].active == true)
+      if (user_list[i].active == true)
         Gui::appendUser(i, user_list[i].name);
     }
   }
@@ -383,15 +383,15 @@ void Chat::addUser(int line, const char *name)
 
 void Chat::removeUser(int line)
 {
-  if(line >= 0 && line < MAX_USERS)
+  if (line >= 0 && line < MAX_USERS)
   {
     user_list[line].active = false;
 
     Gui::clearUsers();
 
-    for(int i = 0; i < MAX_USERS; i++)
+    for (int i = 0; i < MAX_USERS; i++)
     {
-      if(user_list[i].active == true)
+      if (user_list[i].active == true)
         Gui::appendUser(i, user_list[i].name);
     }
   }

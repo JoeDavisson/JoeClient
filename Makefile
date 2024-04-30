@@ -5,7 +5,7 @@
 
 # you MUST have libxft-dev installed before compiling FLTK on linux
 # (otherwise you'll have ugly, non-resizable fonts)
-PLATFORM=linux
+PLATFORM?=linux
 #PLATFORM=mingw32
 #PLATFORM=mingw64
 
@@ -48,6 +48,7 @@ OBJ= \
   $(SRC_DIR)/Separator.o \
 
 default: $(OBJ)
+  $(info Environment is $(PLATFORM))
 	$(CXX) -o ./$(EXE) $(SRC_DIR)/Main.cxx $(OBJ) $(CXXFLAGS) $(LIBS)
 
 fltklib:

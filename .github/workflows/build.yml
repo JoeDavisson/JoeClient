@@ -1,0 +1,30 @@
+name: Build app
+
+on: push
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform: [linux, mingw32, mingw64]
+
+    name: Create build
+    runs-on: ubuntu-latest
+
+    env:
+      PLATFORM: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Prepare FLTK
+        run: |
+          wget https://www.fltk.org/pub/fltk/1.3.7/fltk-1.3.7-source.tar.gz
+          tar -xzf fltk-1.3.7-source.tar.gz
+
+      - name: Build FLTK
+        run: make fltklib
+
+      - name: Build app
+        run: make

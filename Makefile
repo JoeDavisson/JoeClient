@@ -48,7 +48,6 @@ OBJ= \
   $(SRC_DIR)/Separator.o \
 
 default: $(OBJ)
-  $(info Environment is $(PLATFORM))
 	$(CXX) -o ./$(EXE) $(SRC_DIR)/Main.cxx $(OBJ) $(CXXFLAGS) $(LIBS)
 
 fltklib:

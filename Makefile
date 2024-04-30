@@ -27,7 +27,7 @@ endif
 ifeq ($(PLATFORM),mingw32)
   HOST=i686-w64-mingw32
   CXX=$(HOST)-g++
-  CXXFLAGS= -O3 -Wall -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
+  CXXFLAGS= -O3 -Wall -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE) -lws2_32
   LIBS+=-lgdi32 -lcomctl32 -static -lpthread
   EXE=joeclient.exe
 endif
@@ -35,7 +35,7 @@ endif
 ifeq ($(PLATFORM),mingw64)
   HOST=x86_64-w64-mingw32
   CXX=$(HOST)-g++
-  CXXFLAGS= -O3 -Wall -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
+  CXXFLAGS= -O3 -Wall -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE) -lws2_32
   LIBS+=-lgdi32 -lcomctl32 -static -lpthread
   EXE=joeclient.exe
 endif

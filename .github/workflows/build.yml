@@ -21,7 +21,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Add required dependency for FLTK
+      - name: Install dependency
+        run: sudo apt install -y libxft-dev
+
+      - name: Add required dependency for Windows build
         if: ${{ matrix.platform != 'linux' }}
         run: sudo apt install -y mingw-w64
 

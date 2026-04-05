@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Joe Davisson.
+Copyright (c) 2026 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -78,10 +78,9 @@ namespace
     {
       size_t i = 0, j = 0;
 
-      // remove '\r' characters
       for (i = 0; i < size; i++)
       {
-        if (temp_buf[i] != '\r')
+        if (temp_buf[i] != '\0')
           buf[j++] = temp_buf[i];
       }
 
@@ -187,7 +186,7 @@ namespace
     }
   }
 
-  void chat_read(FL_SOCKET sockfd, void *data)
+  void chat_read(FL_SOCKET sockfd, void *)
   {
     memset(buf, 0, sizeof(buf));
     memset(temp_buf, 0, sizeof(buf));

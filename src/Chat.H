@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Joe Davisson.
+Copyright (c) 2026 Joe Davisson.
 
 This file is part of JoeClient.
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Joe Davisson.
+Copyright (c) 2026 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -38,9 +38,10 @@ void DialogWindow::addOkButton(Fl_Button **ok, int *y1)
 {
   new Separator(this, 4, *y1, w() - 8, 2, "");
   *y1 += 8;
-  *ok = new Fl_Button(w() - 64 - 8, *y1, 64, 24, "OK");
+  *ok = new Fl_Button(w() - 72 - 8, *y1, 72, 32, "OK");
+  (*ok)->labelsize(18);
   add(*ok);
-  *y1 += 24 + 8;
+  *y1 += 32 + 8;
   resize(x(), y(), w(), *y1);
 }
 
@@ -48,10 +49,12 @@ void DialogWindow::addOkCancelButtons(Fl_Button **ok, Fl_Button **cancel, int *y
 {
   new Separator(this, 4, *y1, w() - 8, 2, "");
   *y1 += 8;
-  *cancel = new Fl_Button(w() - 64 - 8, *y1, 64, 24, "Cancel");
+  *cancel = new Fl_Button(w() - 72 - 8, *y1, 72, 32, "Cancel");
+  (*cancel)->labelsize(18);
   add(*cancel);
-  *ok = new Fl_Button((*cancel)->x() - 64 - 8, *y1, 64, 24, "Ok");
-  *y1 += 24 + 8;
+  *ok = new Fl_Button((*cancel)->x() - 64 - 8, *y1, 64, 32, "Ok");
+  (*ok)->labelsize(18);
+  *y1 += 32 + 8;
   add(*ok);
   resize(x(), y(), w(), *y1);
 }

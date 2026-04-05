@@ -1,26 +1,25 @@
 # JoeClient Makefile
-#
-# The fltk-1.3.7 source tree must be available in this directory.
-# Please run "make fltk" first to build the library before running "make".
 
-# you MUST have libxft-dev installed before compiling FLTK on linux
+# The official FLTK source tree must be in this directory.
+# run "make fltklib", then "make"
+
+# libxft-dev should be installed before compiling FLTK on linux
 # (otherwise you'll have ugly, non-resizable fonts)
+
+FLTK_DIR=fltk-1.4.4
 PLATFORM=linux
 #PLATFORM=mingw32
 #PLATFORM=mingw64
 
-VERSION="0.1.3"
-#VERSION=$(shell git describe --always --dirty)
-#VERSION=$(shell git describe --always)
-
+VERSION=0.1.5
 SRC_DIR=src
-INCLUDE=-I$(SRC_DIR) -Ifltk-1.3.7
-LIBS=$(shell ./fltk-1.3.7/fltk-config --use-images --ldstaticflags)
+INCLUDES=INCLUDE=-I$(SRC_DIR) -I$(FLTK_DIR)
+LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-images --ldstaticflags)
 
 ifeq ($(PLATFORM),linux)
   HOST=
   CXX=g++
-  CXXFLAGS= -O3 -Wall -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
+  CXXFLAGS= -O3 -Wall -Wunused-parameter -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
   EXE=joeclient
 endif
 
@@ -40,29 +39,33 @@ ifeq ($(PLATFORM),mingw64)
   EXE=joeclient.exe
 endif
 
+CXX=g++
+
 OBJ= \
   $(SRC_DIR)/Chat.o \
   $(SRC_DIR)/Dialog.o \
   $(SRC_DIR)/DialogWindow.o \
   $(SRC_DIR)/Gui.o \
-  $(SRC_DIR)/Separator.o \
+  $(SRC_DIR)/Separator.o
 
+# build program
 default: $(OBJ)
 	$(CXX) -o ./$(EXE) $(SRC_DIR)/Main.cxx $(OBJ) $(CXXFLAGS) $(LIBS)
 
+# build fltk
 fltklib:
-	@cd ./fltk-1.3.7; \
+	cd ./$(FLTK_DIR); \
 	make clean; \
 	./configure --host=$(HOST) --enable-xft --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
-	make; \
-	cd ..
-	@echo "FLTK libs built!"
+	make -j4; \
+	cd ..; \
+	echo "FLTK lib built.";
+
+# remove object files
+clean:
+	@rm -f $(SRC_DIR)/*.o 
+	@echo "Clean."
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.cxx $(SRC_DIR)/%.H
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-clean:
-	@rm -f $(SRC_DIR)/*.o 
-#	@rm -f ./$(EXE)
-	@echo "Clean!"
 

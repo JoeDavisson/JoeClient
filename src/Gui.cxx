@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Joe Davisson.
+Copyright (c) 2026 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -94,7 +94,7 @@ public:
   
   int handle(int event)
   {
-    // bool shift = false, ctrl = false;
+    int ctrl = 0;
 
     switch (event)
     {
@@ -111,14 +111,18 @@ public:
         }
 
         // shift = Fl::event_shift() ? true : false;
-        // ctrl = Fl::event_ctrl() ? true : false;
+        ctrl = Fl::event_ctrl();
 
         // misc keys
         //switch (Fl::event_key())
         //{
         //}
 
-        return 1;
+        // pass ctrl +/-/0 to allow DPI scaling
+        if (ctrl != 0)
+          return Fl_Double_Window::handle(event);
+        else
+          return 1;
     }
 
     return Fl_Double_Window::handle(event);
@@ -133,8 +137,9 @@ void Gui::init()
   window->callback(closeCallback);
 
   // generate menu
-  menubar = new Fl_Menu_Bar(0, 0, window->w(), 24);
+  menubar = new Fl_Menu_Bar(0, 0, window->w(), 28);
   menubar->box(FL_THIN_UP_BOX);
+  menubar->textsize(16);
 
   menubar->add("&Server/&Connect...", 0,
     (Fl_Callback *)Dialog::connectToServer, 0, 0);
@@ -148,14 +153,10 @@ void Gui::init()
     (Fl_Callback *)quit, 0, 0);
 
 
-  menubar->add("&Preferences/&Theme/&Plain", 0,
-    (Fl_Callback *)setPlainTheme, 0, FL_MENU_RADIO);
-  menubar->add("&Preferences/&Theme/Gtk (&Light)", 0,
-    (Fl_Callback *)setGtkLightTheme, 0, FL_MENU_RADIO);
-  menubar->add("&Preferences/&Theme/Gtk (&Dark)", 0,
-    (Fl_Callback *)setGtkDarkTheme, 0, FL_MENU_RADIO);
-  menubar->add("&Preferences/&Theme/&Aqua", 0,
-    (Fl_Callback *)setAquaTheme, 0, FL_MENU_RADIO);
+  menubar->add("&Preferences/&Theme/&Light", 0,
+    (Fl_Callback *)setLightTheme, 0, FL_MENU_RADIO);
+  menubar->add("&Preferences/&Theme/&Dark", 0,
+    (Fl_Callback *)setDarkTheme, 0, FL_MENU_RADIO);
   menubar->add("&Preferences/&Font Size/&Small", 0,
     (Fl_Callback *)setFontSmall, 0, FL_MENU_RADIO);
   menubar->add("&Preferences/&Font Size/&Medium", 0,
@@ -163,7 +164,7 @@ void Gui::init()
   menubar->add("&Preferences/&Font Size/&Large", 0,
     (Fl_Callback *)setFontLarge, 0, FL_MENU_RADIO);
 
-  setMenuItem("&Preferences/&Theme/&Plain");
+  setMenuItem("&Preferences/&Theme/&Light");
   setMenuItem("&Preferences/&Font Size/&Medium");
 
   menubar->add("&Help/&About", 0,
@@ -180,12 +181,12 @@ void Gui::init()
   url_display = new Fl_Help_View(bottom->x(), bottom->y(),
                                  bottom->w() / 2, bottom->h());
   url_display->box(FL_UP_BOX);
-  url_display->textsize(14);
+  url_display->textsize(16);
 
   pm_display = new Fl_Text_Display(bottom->x() + bottom->w() / 2, bottom->y(),
                                    bottom->w() / 2, bottom->h());
   pm_display->box(FL_UP_BOX);
-  pm_display->textsize(14);
+  pm_display->textsize(16);
   pm_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   pm_display->buffer(pm_text);
 
@@ -198,7 +199,7 @@ void Gui::init()
   user_display = new Fl_Text_Display(menubar->w() - 128, menubar->h(),
                                128, top->h());
   user_display->box(FL_UP_BOX);
-  user_display->textsize(14);
+  user_display->textsize(16);
   user_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   user_display->buffer(user_text);
 
@@ -206,7 +207,8 @@ void Gui::init()
                      window->w() - user_display->w(), top->h());
 
   input_field = new Fl_Input(0, bottom->y() - 32, top_left->w(), 32);
-  input_field->textsize(16);
+  input_field->box(FL_UP_BOX);
+  input_field->textsize(18);
   input_field->when(FL_WHEN_ENTER_KEY);
   input_field->callback((Fl_Callback *)sendMessage);
 
@@ -215,9 +217,7 @@ void Gui::init()
                                        top_left->w(),
                                        top_left->h() - input_field->h());
 
-  //server_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   server_display->box(FL_UP_BOX);
-  server_display->textsize(14);
   server_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   server_display->buffer(server_text);
 
@@ -231,13 +231,9 @@ void Gui::init()
   window->resizable(top);
   window->end();
 
-  setPlainTheme();
+  setFontMedium();
+  setLightTheme();
   clearURLs();
-
-  // fix certain icons if using a light theme
-  //if (Project::theme == Project::THEME_LIGHT)
-  //{
-  //}
 }
 
 // show the main program window (called after gui is constructed)
@@ -383,7 +379,6 @@ void Gui::clearPMs()
 
 void Gui::linkColor()
 {
-return;
   // remove first line
   url_text->remove(url_text->line_start(1),
                    url_text->line_end(1) + 1);
@@ -407,75 +402,56 @@ void Gui::sendMessage()
   input_field->value("");
 }
 
-void Gui::setPlainTheme()
+void Gui::setLightTheme()
 {
-  Fl::set_color(FL_BACKGROUND_COLOR, 224, 224, 224);
-  Fl::set_color(FL_BACKGROUND2_COLOR, 192, 192, 192);
-  Fl::set_color(FL_FOREGROUND_COLOR, 0, 0, 0);
-  Fl::set_color(FL_INACTIVE_COLOR, 128, 128, 128);
-  Fl::set_color(FL_SELECTION_COLOR, 64, 64, 64);
-  input_field->color(fl_rgb_color(208, 208, 208));
-  Dialog::setButtonColor(fl_rgb_color(192, 192, 192));
-  strncpy(url_color, "#000000", sizeof(url_color));
-  linkColor();
-  Fl::scheme("none");
-  getWindow()->redraw();
-}
+/*
+  for (int i = 0; i < 24; i++)
+  {
+    int v = 128 + i * 3;
+    Fl::set_color(i, fl_rgb_color(255, v, v));
+  }
+*/
 
-void Gui::setGtkLightTheme()
-{
-  Fl::set_color(FL_BACKGROUND_COLOR, 224, 224, 224);
-  Fl::set_color(FL_BACKGROUND2_COLOR, 192, 192, 192);
-  Fl::set_color(FL_FOREGROUND_COLOR, 0, 0, 0);
+  Fl::set_color(FL_BACKGROUND_COLOR, 240, 240, 240);
+  Fl::set_color(FL_BACKGROUND2_COLOR, 224, 224, 224);
+  Fl::set_color(FL_FOREGROUND_COLOR, 8, 8, 8);
   Fl::set_color(FL_INACTIVE_COLOR, 128, 128, 128);
-  Fl::set_color(FL_SELECTION_COLOR, 80, 80, 80);
-  input_field->color(fl_rgb_color(176, 176, 176));
-  Dialog::setButtonColor(fl_rgb_color(192, 192, 192));
+  Fl::set_color(FL_SELECTION_COLOR, 180, 180, 180);
+ 
+  menubar->color(fl_rgb_color(224, 224, 224));
+  input_field->color(fl_rgb_color(224, 224, 224));
+  server_display->color(fl_rgb_color(255, 255, 255));
+  url_display->color(fl_rgb_color(240, 240, 240));
+  pm_display->color(fl_rgb_color(240, 240, 240));
+  user_display->color(fl_rgb_color(240, 240, 240));
+  Dialog::setButtonColor(fl_rgb_color(248, 248, 248));
   strncpy(url_color, "#000000", sizeof(url_color));
   linkColor();
   Fl::scheme("gtk+");
   getWindow()->redraw();
 }
 
-void Gui::setGtkDarkTheme()
+void Gui::setDarkTheme()
 {
-  Fl::set_color(FL_BACKGROUND_COLOR, 80, 80, 80);
-  Fl::set_color(FL_BACKGROUND2_COLOR, 64, 64, 64);
-  Fl::set_color(FL_FOREGROUND_COLOR, 248, 248, 248);
+  Fl::set_color(FL_BACKGROUND_COLOR, 24, 24, 24);
+  Fl::set_color(FL_BACKGROUND2_COLOR, 40, 40, 40);
+  Fl::set_color(FL_FOREGROUND_COLOR, 208, 208, 208);
   Fl::set_color(FL_INACTIVE_COLOR, 128, 128, 128);
-  Fl::set_color(FL_SELECTION_COLOR, 224, 224, 224);
-  input_field->color(fl_rgb_color(56, 56, 56));
-  Dialog::setButtonColor(fl_rgb_color(96, 96, 96));
+  Fl::set_color(FL_SELECTION_COLOR, 64, 64, 64);
+  menubar->color(fl_rgb_color(40, 40, 40));
+  input_field->color(fl_rgb_color(32, 32, 32));
+  server_display->color(fl_rgb_color(16, 16, 16));
+  url_display->color(fl_rgb_color(24, 24, 24));
+  pm_display->color(fl_rgb_color(24, 24, 24));
+  user_display->color(fl_rgb_color(24, 24, 24));
+  Dialog::setButtonColor(fl_rgb_color(32, 32, 32));
   strncpy(url_color, "#ffffff", sizeof(url_color));
   linkColor();
   Fl::scheme("gtk+");
   getWindow()->redraw();
 }
 
-void Gui::setAquaTheme()
-{
-  Fl::set_color(FL_BACKGROUND_COLOR, 224, 224, 224);
-  Fl::set_color(FL_BACKGROUND2_COLOR, 208, 208, 208);
-  Fl::set_color(FL_FOREGROUND_COLOR, 0, 0, 0);
-  Fl::set_color(FL_INACTIVE_COLOR, 192, 192, 192);
-  Fl::set_color(FL_SELECTION_COLOR, 255, 255, 255);
-  input_field->color(fl_rgb_color(208, 208, 208));
-  Dialog::setButtonColor(fl_rgb_color(255, 255, 255));
-  strncpy(url_color, "#000000", sizeof(url_color));
-  linkColor();
-  Fl::scheme("plastic");
-  getWindow()->redraw();
-}
-
 void Gui::setFontSmall()
-{
-  server_display->textsize(12);
-  server_display->buffer(0);
-  server_display->buffer(server_text);
-  server_display->redraw();
-}
-
-void Gui::setFontMedium()
 {
   server_display->textsize(14);
   server_display->buffer(0);
@@ -483,9 +459,17 @@ void Gui::setFontMedium()
   server_display->redraw();
 }
 
-void Gui::setFontLarge()
+void Gui::setFontMedium()
 {
   server_display->textsize(16);
+  server_display->buffer(0);
+  server_display->buffer(server_text);
+  server_display->redraw();
+}
+
+void Gui::setFontLarge()
+{
+  server_display->textsize(18);
   server_display->buffer(0);
   server_display->buffer(server_text);
   server_display->redraw();

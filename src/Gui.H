@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Joe Davisson.
+Copyright (c) 2026 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -42,10 +42,8 @@ public:
   static void clearPMs();
   static void linkColor();
   static void sendMessage();
-  static void setPlainTheme();
-  static void setGtkLightTheme();
-  static void setGtkDarkTheme();
-  static void setAquaTheme();
+  static void setLightTheme();
+  static void setDarkTheme();
   static void setFontSmall();
   static void setFontMedium();
   static void setFontLarge();

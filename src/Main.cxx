@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Joe Davisson.
+Copyright (c) 2026 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -26,8 +26,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include "Dialog.H"
 #include "Gui.H"
 
-int main(int argc, char *argv[])
+int main(/*int argc, char *argv[]*/)
 {
+  Fl::screen_scale(0, 1.0);
+
 #ifndef WIN32
   // ignore SIGPIPE
   signal(SIGPIPE, SIG_IGN);

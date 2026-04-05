@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2024 Joe Davisson.
+Copyright (c) 2026 Joe Davisson.
 
 This file is part of JoeClient.
 
@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with JoeClient; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
+
+#include <cstdlib>
 
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>
@@ -73,14 +75,13 @@ namespace About
     Items::title->labelfont(FL_HELVETICA_BOLD);
     y1 += 48;
     Items::copyright = new Fl_Box(FL_FLAT_BOX, 0, y1, 384, 32,
-                                  "Copyright (c) 2024 Joe Davisson");
+                                  "Copyright (c) 2026 Joe Davisson");
     Items::copyright->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
-    Items::copyright->labelsize(14);
+    Items::copyright->labelsize(16);
     y1 += 24;
     Items::version = new Fl_Box(FL_FLAT_BOX, 0, y1, 384, 32, PACKAGE_STRING);
     Items::version->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
-    Items::version->labelfont(FL_HELVETICA_ITALIC);
-    Items::version->labelsize(12);
+    Items::version->labelsize(16);
     y1 += 24;
     Items::dialog->addOkButton(&Items::ok, &y1);
     Items::ok->callback((Fl_Callback *)close);
@@ -123,19 +124,24 @@ namespace Connect
 
   void init()
   {
-    int y1 = 8;
+    int y1 = 16;
 
-    Items::dialog = new DialogWindow(384, 0, "Connect to Server");
-    Items::address = new Fl_Input(88, y1, 128, 24, "Address: ");
+    Items::dialog = new DialogWindow(480, 0, "Connect to Server");
+    Items::address = new Fl_Input(112, y1, 192, 24, "Address: ");
     Items::address->align(FL_ALIGN_LEFT);
     Items::address->value("localhost");
-    Items::port = new Fl_Int_Input(280, y1, 64, 24, "Port: ");
+    Items::address->textsize(20);
+    Items::address->labelsize(18);
+    Items::port = new Fl_Int_Input(388, y1, 64, 24, "Port: ");
     Items::port->align(FL_ALIGN_LEFT);
     Items::port->value("6666");
-    y1 += 32;
-    Items::keep_alive = new Fl_Check_Button(160, y1, 24, 24, "Keep Alive");
+    Items::port->textsize(20);
+    Items::port->labelsize(18);
+    y1 += 40;
+    Items::keep_alive = new Fl_Check_Button(172, y1, 24, 24, "Keep Alive");
     Items::keep_alive->value(0);
-    y1 += 32;
+    Items::keep_alive->labelsize(18);
+    y1 += 40;
     Items::dialog->addOkCancelButtons(&Items::ok, &Items::cancel, &y1);
     Items::ok->callback((Fl_Callback *)close);
     Items::cancel->callback((Fl_Callback *)quit);
@@ -174,7 +180,7 @@ namespace Message
     Items::dialog = new DialogWindow(384, 0, "Error");
     Items::box = new Fl_Box(FL_FLAT_BOX, 8, 8, 384, 64, "");
     Items::box->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
-    Items::box->labelsize(14); 
+    Items::box->labelsize(16); 
     y1 += 64;
     Items::dialog->addOkButton(&Items::ok, &y1);
     Items::ok->callback((Fl_Callback *)quit);
@@ -225,7 +231,7 @@ namespace Choice
     Items::dialog = new DialogWindow(384, 0, "Error");
     Items::box = new Fl_Box(FL_FLAT_BOX, 8, 8, 384, 64, "");
     Items::box->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
-    Items::box->labelsize(14); 
+    Items::box->labelsize(16); 
     y1 += 64;
     Items::dialog->addOkCancelButtons(&Items::ok, &Items::cancel, &y1);
     Items::ok->copy_label("Yes");
@@ -263,8 +269,12 @@ void Dialog::message(const char *title, const char *message)
 bool Dialog::choice(const char *title, const char *message)
 {
   Choice::begin(title, message);
+
   while (Choice::Items::dialog->shown())
+  {
     Fl::check();
+  }
+
   return Choice::yes;
 }
 

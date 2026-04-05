@@ -13,7 +13,7 @@ PLATFORM=linux
 
 VERSION=0.1.5
 SRC_DIR=src
-INCLUDES=INCLUDE=-I$(SRC_DIR) -I$(FLTK_DIR)
+INCLUDE=-I$(SRC_DIR) -I$(FLTK_DIR)
 LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-images --ldstaticflags)
 
 ifeq ($(PLATFORM),linux)

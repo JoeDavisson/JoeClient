@@ -303,6 +303,7 @@ void Chat::connectToServer(const char *address, const int port,
   }
 #endif
 
+  connected = true;
   enable_ssl = enable_ssl_value;
 
   if (enable_ssl == true)
@@ -329,21 +330,15 @@ void Chat::connectToServer(const char *address, const int port,
 
     SSL_set_fd(ssl, sock);
 
-    if (SSL_connect(ssl) != 1)
+    int ssl_connect = SSL_connect(ssl);
+
+    if (ssl_connect != 1)
     {
       Chat::disconnect("Error", "Server does not support SSL.");
-/*
-#ifdef WIN32
-      closesocket(sock);
-#else
-      close(sock);
-#endif
-*/
       return;
     }
   }
 
-  connected = true;
   keep_alive = keep_alive_value;
   time(&start_time);
 
@@ -381,12 +376,6 @@ void Chat::disconnect(const char *title, const char *message)
 {
   if (connected == true)
   {
-    if (enable_ssl == true)
-    {
-      SSL_free(ssl);
-      SSL_CTX_free(ctx);
-    }
-
     Fl::remove_fd(sock);
 
 #ifdef WIN32

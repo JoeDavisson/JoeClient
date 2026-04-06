@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
+#include <openssl/ssl.h>
 
 #ifdef WIN32
   #include <winsock2.h>
@@ -54,12 +55,16 @@ namespace
   struct addrinfo *ip_info;
   struct addrinfo hints;
 
+  SSL_CTX *ctx = 0;
+  SSL *ssl = 0;
+
   char buf[1024];
   char ip_buf[1024];
   char url_buf[2048];
   char temp_buf[1024];
 
   bool connected = false;
+  bool enable_ssl = false;
   bool keep_alive = false;
 
   time_t start_time, elapsed_time;
@@ -182,7 +187,7 @@ namespace
     }
       else
     {
-      Chat::disconnect();
+      Chat::disconnect("Disconnected", "Connection Closed");
     }
   }
 
@@ -195,9 +200,20 @@ namespace
     int size = recv(sockfd, temp_buf, sizeof(temp_buf), 0);
     handle_msg(size);
   }
+
+  void chat_read_ssl(FL_SOCKET, void *)
+  {
+    memset(buf, 0, sizeof(buf));
+    memset(temp_buf, 0, sizeof(buf));
+    memset(url_buf, 0, sizeof(buf));
+
+    int size = SSL_read(ssl, temp_buf, sizeof(temp_buf));
+    handle_msg(size);
+  }
 }
 
 void Chat::connectToServer(const char *address, const int port,
+                           const bool enable_ssl_value,
                            const bool keep_alive_value)
 {
   if (connected == true)
@@ -224,7 +240,7 @@ void Chat::connectToServer(const char *address, const int port,
   if (getaddrinfo(address, 0, &hints, &ip_info) != 0)
   {
 #ifdef WIN32
-      WSACleanup();
+    WSACleanup();
 #endif
     Dialog::message("Error", "Could not obtain IP address.");
     return;
@@ -287,13 +303,54 @@ void Chat::connectToServer(const char *address, const int port,
   }
 #endif
 
+  enable_ssl = enable_ssl_value;
+
+  if (enable_ssl == true)
+  {
+    const SSL_METHOD *method = TLS_client_method();
+
+    SSL_CTX_free(ctx);
+    ctx = SSL_CTX_new(method);
+
+    if (ctx == NULL)
+    {
+      Chat::disconnect("Error", "SSL_CTX_new failed");
+      return;
+    }
+
+    SSL_free(ssl);
+    ssl = SSL_new(ctx);
+
+    if (ssl == NULL)
+    {
+      Chat::disconnect("Error", "SSL_new failed");
+      return;
+    }
+
+    SSL_set_fd(ssl, sock);
+
+    if (SSL_connect(ssl) != 1)
+    {
+      Chat::disconnect("Error", "Server does not support SSL.");
+/*
+#ifdef WIN32
+      closesocket(sock);
+#else
+      close(sock);
+#endif
+*/
+      return;
+    }
+  }
+
   connected = true;
   keep_alive = keep_alive_value;
   time(&start_time);
 
   // announcement
   char connect_string[256];
-  snprintf(connect_string, sizeof(connect_string), "%c has connected using JoeClient", 0x25);
+  snprintf(connect_string, sizeof(connect_string),
+           "%% has connected using JoeClient");
 
   Chat::write(connect_string);
 
@@ -301,15 +358,37 @@ void Chat::connectToServer(const char *address, const int port,
   Chat::write(".Z");
 
   if (keep_alive_value)
+  {
     Fl::add_timeout(120, Chat::keepAlive);
+  }
 
-  Fl::add_fd(sock, FL_READ, chat_read, NULL);
+  if (enable_ssl == true)
+  {
+    Fl::add_fd(sock, FL_READ, chat_read_ssl, NULL);
+  }
+    else
+  {
+    Fl::add_fd(sock, FL_READ, chat_read, NULL);
+  }
 }
 
-void Chat::disconnect()
+void Chat::userDisconnected()
+{
+  Chat::disconnect("Disconnected", "Connection Closed");
+}
+
+void Chat::disconnect(const char *title, const char *message)
 {
   if (connected == true)
   {
+    if (enable_ssl == true)
+    {
+      SSL_free(ssl);
+      SSL_CTX_free(ctx);
+    }
+
+    Fl::remove_fd(sock);
+
 #ifdef WIN32
     closesocket(sock);
     WSACleanup();
@@ -318,7 +397,7 @@ void Chat::disconnect()
 #endif
 
     connected = false;
-    Dialog::message("Disconnected", "Connection Closed");
+    Dialog::message(title, message);
   }
 }
 
@@ -326,22 +405,30 @@ void Chat::write(const char *message)
 {
   if (connected == true)
   {
-    struct timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 100000;
-
-    fd_set fd;
-    FD_ZERO(&fd);
-
-    if (sock != 0)
-      FD_SET(sock, &fd);
-
-    select(sock + 1, 0, &fd, 0, &tv);
-
-    if (sock != 0 && FD_ISSET(sock, &fd))
+    if (enable_ssl == true)
     {
-      send(sock, message, strlen(message), 0);
-      send(sock, "\n", 1, 0);
+      SSL_write(ssl, message, strlen(message));
+      SSL_write(ssl, "\n", 1);
+    }
+      else
+    {
+      struct timeval tv;
+      tv.tv_sec = 0;
+      tv.tv_usec = 100000;
+
+      fd_set fd;
+      FD_ZERO(&fd);
+
+      if (sock != 0)
+        FD_SET(sock, &fd);
+
+      select(sock + 1, 0, &fd, 0, &tv);
+
+      if (sock != 0 && FD_ISSET(sock, &fd))
+      {
+        send(sock, message, strlen(message), 0);
+        send(sock, "\n", 1, 0);
+      }
     }
   }
 }
@@ -375,7 +462,9 @@ void Chat::addUser(int line, const char *name)
     for (int i = 0; i < MAX_USERS; i++)
     {
       if (user_list[i].active == true)
+      {
         Gui::appendUser(i, user_list[i].name);
+      }
     }
   }
 }
@@ -391,7 +480,9 @@ void Chat::removeUser(int line)
     for (int i = 0; i < MAX_USERS; i++)
     {
       if (user_list[i].active == true)
+      {
         Gui::appendUser(i, user_list[i].name);
+      }
     }
   }
 }

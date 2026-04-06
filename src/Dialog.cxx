@@ -34,7 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include "Chat.H"
 #include "Dialog.H"
 #include "DialogWindow.H"
-#include "Gui.H"
 
 namespace
 {
@@ -97,6 +96,7 @@ namespace Connect
     DialogWindow *dialog;
     Fl_Input *address;
     Fl_Int_Input *port;
+    Fl_Check_Button *enable_ssl;
     Fl_Check_Button *keep_alive;
     Fl_Button *ok;
     Fl_Button *cancel;
@@ -113,7 +113,9 @@ namespace Connect
   void close()
   {
     Items::dialog->hide();
-    Chat::connectToServer(Items::address->value(), atoi(Items::port->value()),
+    Chat::connectToServer(Items::address->value(),
+                          atoi(Items::port->value()),
+                          Items::enable_ssl->value(),
                           Items::keep_alive->value());
   }
 
@@ -138,7 +140,10 @@ namespace Connect
     Items::port->textsize(20);
     Items::port->labelsize(18);
     y1 += 40;
-    Items::keep_alive = new Fl_Check_Button(172, y1, 24, 24, "Keep Alive");
+    Items::enable_ssl = new Fl_Check_Button(128, y1, 24, 24, "SSL");
+    Items::enable_ssl->value(0);
+    Items::enable_ssl->labelsize(18);
+    Items::keep_alive = new Fl_Check_Button(240, y1, 24, 24, "Keep Alive");
     Items::keep_alive->value(0);
     Items::keep_alive->labelsize(18);
     y1 += 40;

@@ -26,8 +26,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 class Chat
 {
 public:
-  static void connectToServer(const char *, const int, const bool);
-  static void disconnect();
+  static void connectToServer(const char *, const int, const bool, const bool);
+  static void userDisconnected();
+  static void disconnect(const char *, const char *);
   static void write(const char *);
   static void keepAlive(void *);
   static void addUser(int, const char *);

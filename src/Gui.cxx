@@ -18,8 +18,7 @@ along with JoeClient; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#include <cmath>
-#include <typeinfo>
+#include <cstdlib>
 
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Double_Window.H>
@@ -66,7 +65,9 @@ namespace
   void quit()
   {
     if (Dialog::choice("Quit", "Are You Sure?"))
+    {
       exit(0);
+    }
   }
 
   // prevent escape from closing main window
@@ -144,7 +145,7 @@ void Gui::init()
   menubar->add("&Server/&Connect...", 0,
     (Fl_Callback *)Dialog::connectToServer, 0, 0);
   menubar->add("&Server/&Disconnect", 0,
-    (Fl_Callback *)Chat::disconnect, 0, FL_MENU_DIVIDER);
+    (Fl_Callback *)Chat::userDisconnected, 0, FL_MENU_DIVIDER);
   menubar->add("&Server/Clear &Web Links", 0,
     (Fl_Callback *)clearURLs, 0, 0);
   menubar->add("&Server/&Clear &Private Messages", 0,
@@ -404,14 +405,6 @@ void Gui::sendMessage()
 
 void Gui::setLightTheme()
 {
-/*
-  for (int i = 0; i < 24; i++)
-  {
-    int v = 128 + i * 3;
-    Fl::set_color(i, fl_rgb_color(255, v, v));
-  }
-*/
-
   Fl::set_color(FL_BACKGROUND_COLOR, 240, 240, 240);
   Fl::set_color(FL_BACKGROUND2_COLOR, 224, 224, 224);
   Fl::set_color(FL_FOREGROUND_COLOR, 8, 8, 8);

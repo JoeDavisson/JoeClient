@@ -15,12 +15,12 @@ VERSION=0.1.5
 SRC_DIR=src
 INCLUDE=-I$(SRC_DIR) -I$(FLTK_DIR)
 LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-images --ldstaticflags)
+LIBS+=-lssl -lcrypto
 
 ifeq ($(PLATFORM),linux)
   HOST=
   CXX=g++
-  CXXFLAGS= -g -O3 -Wall -Wunused-parameter -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
-  LIBS+=-lssl -lcrypto
+  CXXFLAGS= -O3 -Wall -Wunused-parameter -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
   EXE=joeclient
 endif
 
@@ -65,6 +65,7 @@ fltklib:
 # remove object files
 clean:
 	@rm -f $(SRC_DIR)/*.o 
+	@rm -f ./joeclient
 	@echo "Clean."
 
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.cxx $(SRC_DIR)/%.H

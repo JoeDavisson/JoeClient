@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Tile.H>
 #include <FL/Fl_Tooltip.H>
 
 #include "Chat.H"
@@ -43,9 +44,12 @@ namespace
   // main menu
   Fl_Menu_Bar *menubar;
 
-  Fl_Group *top;
+  Fl_Tile *vertical;
+  Fl_Tile *top;
   Fl_Group *top_left;
   Fl_Group *bottom;
+  Fl_Group *input_group;
+  Fl_Box *input_bracket;
 
   Fl_Text_Buffer *server_text;
   Fl_Text_Buffer *user_text;
@@ -121,12 +125,57 @@ public:
 
         // pass ctrl +/-/0 to allow DPI scaling
         if (ctrl != 0)
+        {
           return Fl_Double_Window::handle(event);
-        else
+        }
+          else
+        {
           return 1;
+        }
     }
 
     return Fl_Double_Window::handle(event);
+  }
+
+  void draw()
+  {
+    Fl_Double_Window::draw();
+
+    // draw separator handles
+    const int x1 = user_display->x();
+    const int y1 = user_display->y();
+    const int h1 = user_display->h();
+
+    const int cx = w() / 2;
+    const int cy = user_display->y() + user_display->h() / 2;
+
+    Fl_Color gray = fl_rgb_color(128, 128, 128);
+
+    fl_rectf(x1 - 3, y1, 7, h1, gray);
+    fl_rectf(x1 - 2, y1 + 1, 5, h1 - 2, FL_BACKGROUND_COLOR);
+
+    fl_draw_circle(x1 - 1, cy - 1, 3, gray);
+    fl_draw_circle(x1 - 1, cy - 1 - 5, 3, gray);
+    fl_draw_circle(x1 - 1, cy - 1 + 5, 3, gray);
+    fl_draw_circle(x1 - 1, cy - 1 - 10, 3, gray);
+    fl_draw_circle(x1 - 1, cy - 1 + 10, 3, gray);
+    
+    fl_rectf(0, bottom->y() - 3, w(), 7, gray);
+    fl_rectf(1, bottom->y() - 2, w() - 2, 5, FL_BACKGROUND_COLOR);
+
+    fl_draw_circle(cx - 1, bottom->y() - 1, 3, gray);
+    fl_draw_circle(cx - 1 - 5, bottom->y() - 1, 3, gray);
+    fl_draw_circle(cx - 1 + 5, bottom->y() - 1, 3, gray);
+    fl_draw_circle(cx - 1 - 10, bottom->y() - 1, 3, gray);
+    fl_draw_circle(cx - 1 + 10, bottom->y() - 1, 3, gray);
+
+    fl_rect(0, 0, w(), h(), gray);
+    fl_rect(1, 1, w() - 2, h() - 2, gray);
+
+    fl_rect(0, menubar->h(), w(), h(),
+            fl_color_average(FL_BACKGROUND_COLOR, gray, 0.8));
+    fl_rect(0, menubar->h() + 1, w(), h(),
+            fl_color_average(FL_BACKGROUND_COLOR, gray, 0.8));
   }
 };
 
@@ -139,7 +188,7 @@ void Gui::init()
 
   // generate menu
   menubar = new Fl_Menu_Bar(0, 0, window->w(), 28);
-  menubar->box(FL_THIN_UP_BOX);
+  menubar->box(FL_UP_BOX);
   menubar->textsize(16);
 
   menubar->add("&Server/&Connect...", 0,
@@ -152,7 +201,6 @@ void Gui::init()
     (Fl_Callback *)clearPMs, 0, FL_MENU_DIVIDER);
   menubar->add("&Server/&Quit", 0,
     (Fl_Callback *)quit, 0, 0);
-
 
   menubar->add("&Preferences/&Theme/&Light", 0,
     (Fl_Callback *)setLightTheme, 0, FL_MENU_RADIO);
@@ -176,26 +224,16 @@ void Gui::init()
   url_text = new Fl_Text_Buffer();
   pm_text = new Fl_Text_Buffer();
 
-  // bottom group
-  bottom = new Fl_Group(0, window->h() - 144, window->w(), 144);
-
-  url_display = new Fl_Help_View(bottom->x(), bottom->y(),
-                                 bottom->w() / 2, bottom->h());
-  url_display->box(FL_UP_BOX);
-  url_display->textsize(16);
-
-  pm_display = new Fl_Text_Display(bottom->x() + bottom->w() / 2, bottom->y(),
-                                   bottom->w() / 2, bottom->h());
-  pm_display->box(FL_UP_BOX);
-  pm_display->textsize(16);
-  pm_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-  pm_display->buffer(pm_text);
-
-  bottom->end();
+  
+  // vertical group
+  vertical = new Fl_Tile(0, menubar->h(),
+                         window->w(), window->h() - menubar->h());
+  vertical->box(FL_FLAT_BOX);
 
   // top group
-  top = new Fl_Group(0, menubar->h(),
-                     window->w(), bottom->y() - menubar->h());
+  top = new Fl_Tile(0, menubar->h(),
+                    window->w(), window->h() - 144 - menubar->h());
+  top->box(FL_FLAT_BOX);
 
   user_display = new Fl_Text_Display(menubar->w() - 128, menubar->h(),
                                128, top->h());
@@ -203,15 +241,26 @@ void Gui::init()
   user_display->textsize(16);
   user_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   user_display->buffer(user_text);
+  top->size_range(user_display, 96, 256);
 
   top_left = new Fl_Group(0, menubar->h(),
                      window->w() - user_display->w(), top->h());
 
-  input_field = new Fl_Input(0, bottom->y() - 32, top_left->w(), 32);
+  input_group = new Fl_Group(0, window->h() - 144 - 32, top_left->w(), 32, 0);
+
+  input_bracket = new Fl_Box(input_group->x(), input_group->y(),
+                             32, 32, ">");
+
+  input_field = new Fl_Input(32, window->h() - 144 - 32,
+                             top_left->w() - 32, 32, 0);
+  input_field->align(FL_ALIGN_LEFT);
   input_field->box(FL_UP_BOX);
   input_field->textsize(18);
   input_field->when(FL_WHEN_ENTER_KEY);
   input_field->callback((Fl_Callback *)sendMessage);
+
+  input_group->resizable(input_field);
+  input_group->end();
 
   server_display = new Fl_Text_Display(top_left->x(),
                                        top_left->y(),
@@ -220,16 +269,42 @@ void Gui::init()
 
   server_display->box(FL_UP_BOX);
   server_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+  server_display->scrollbar_size(18);
   server_display->buffer(server_text);
 
   top_left->resizable(server_display);
   top_left->end();
 
+  top->size_range(top_left, 544, 256);
   top->resizable(top_left);
   top->end();
 
-  window->size_range(512, 384, 0, 0, 0, 0, 0);
-  window->resizable(top);
+  // bottom group
+  bottom = new Fl_Group(0, window->h() - 144, window->w(), 144);
+
+  url_display = new Fl_Help_View(bottom->x(), bottom->y(),
+                                 bottom->w() / 2, bottom->h());
+  url_display->box(FL_UP_BOX);
+  url_display->textsize(16);
+  url_display->scrollbar_size(18);
+
+  pm_display = new Fl_Text_Display(bottom->x() + bottom->w() / 2, bottom->y(),
+                                   bottom->w() / 2, bottom->h());
+  pm_display->box(FL_UP_BOX);
+  pm_display->textsize(16);
+  pm_display->scrollbar_size(18);
+  pm_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+  pm_display->buffer(pm_text);
+
+  bottom->end();
+
+  vertical->size_range(top, 640, 384);
+  vertical->size_range(bottom, 640, 96);
+  vertical->resizable(top);
+  vertical->end();
+
+  window->size_range(640, 480, 0, 0, 0, 0, 0);
+  window->resizable(vertical);
   window->end();
 
   setFontMedium();
@@ -412,7 +487,7 @@ void Gui::setLightTheme()
   Fl::set_color(FL_SELECTION_COLOR, 180, 180, 180);
  
   menubar->color(fl_rgb_color(224, 224, 224));
-  input_field->color(fl_rgb_color(224, 224, 224));
+  input_field->color(fl_rgb_color(255, 255, 255));
   server_display->color(fl_rgb_color(255, 255, 255));
   url_display->color(fl_rgb_color(240, 240, 240));
   pm_display->color(fl_rgb_color(240, 240, 240));
@@ -432,7 +507,7 @@ void Gui::setDarkTheme()
   Fl::set_color(FL_INACTIVE_COLOR, 128, 128, 128);
   Fl::set_color(FL_SELECTION_COLOR, 64, 64, 64);
   menubar->color(fl_rgb_color(40, 40, 40));
-  input_field->color(fl_rgb_color(32, 32, 32));
+  input_field->color(fl_rgb_color(16, 16, 16));
   server_display->color(fl_rgb_color(16, 16, 16));
   url_display->color(fl_rgb_color(24, 24, 24));
   pm_display->color(fl_rgb_color(24, 24, 24));

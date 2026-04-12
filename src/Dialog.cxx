@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/Fl.H>
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Input.H>
@@ -32,6 +31,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/Fl_Widget.H>
 
 #include "Chat.H"
+#include "CheckBox.H"
 #include "Dialog.H"
 #include "DialogWindow.H"
 
@@ -96,8 +96,8 @@ namespace Connect
     DialogWindow *dialog;
     Fl_Input *address;
     Fl_Int_Input *port;
-    Fl_Check_Button *enable_ssl;
-    Fl_Check_Button *keep_alive;
+    CheckBox *enable_ssl;
+    CheckBox *keep_alive;
     Fl_Button *ok;
     Fl_Button *cancel;
   }
@@ -140,10 +140,11 @@ namespace Connect
     Items::port->textsize(20);
     Items::port->labelsize(18);
     y1 += 40;
-    Items::enable_ssl = new Fl_Check_Button(128, y1, 24, 24, "SSL");
+    Items::enable_ssl = new CheckBox(Items::dialog, 128, y1, 24, 24, "SSL", 0);
     Items::enable_ssl->value(0);
     Items::enable_ssl->labelsize(18);
-    Items::keep_alive = new Fl_Check_Button(240, y1, 24, 24, "Keep Alive");
+    Items::keep_alive = new CheckBox(Items::dialog, 240, y1, 24, 24,
+                                     "Keep Alive", 0);
     Items::keep_alive->value(0);
     Items::keep_alive->labelsize(18);
     y1 += 40;

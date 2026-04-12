@@ -44,6 +44,7 @@ CXX=g++
 
 OBJ= \
   $(SRC_DIR)/Chat.o \
+  $(SRC_DIR)/CheckBox.o \
   $(SRC_DIR)/Dialog.o \
   $(SRC_DIR)/DialogWindow.o \
   $(SRC_DIR)/Gui.o \

@@ -487,8 +487,8 @@ void Gui::setLightTheme()
   Fl::set_color(FL_SELECTION_COLOR, 180, 180, 180);
  
   menubar->color(fl_rgb_color(240, 240, 240));
-  input_field->color(fl_rgb_color(255, 255, 255));
-  server_display->color(fl_rgb_color(255, 255, 255));
+  input_field->color(fl_rgb_color(248, 248, 248));
+  server_display->color(fl_rgb_color(248, 248, 248));
   url_display->color(fl_rgb_color(240, 240, 240));
   pm_display->color(fl_rgb_color(240, 240, 240));
   user_display->color(fl_rgb_color(240, 240, 240));
@@ -506,6 +506,7 @@ void Gui::setDarkTheme()
   Fl::set_color(FL_FOREGROUND_COLOR, 208, 208, 208);
   Fl::set_color(FL_INACTIVE_COLOR, 128, 128, 128);
   Fl::set_color(FL_SELECTION_COLOR, 64, 64, 64);
+
   menubar->color(fl_rgb_color(24, 24, 24));
   input_field->color(fl_rgb_color(16, 16, 16));
   server_display->color(fl_rgb_color(16, 16, 16));

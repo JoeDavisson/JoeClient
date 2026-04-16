@@ -33,6 +33,7 @@ public:
   static void keepAlive(void *);
   static void addUser(int, const char *);
   static void removeUser(int);
+  static bool isConnected();
 
 private:
   Chat() { }

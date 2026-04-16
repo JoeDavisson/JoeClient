@@ -216,12 +216,6 @@ void Chat::connectToServer(const char *address, const int port,
                            const bool enable_ssl_value,
                            const bool keep_alive_value)
 {
-  if (connected == true)
-  {
-    Dialog::message("Error", "Already connected to a server.");
-    return;
-  }
-
   for (int i = 0; i < MAX_USERS; i++)
     user_list[i].active = false;
 
@@ -388,6 +382,8 @@ void Chat::disconnect(const char *title, const char *message)
     connected = false;
     Dialog::message(title, message);
   }
+
+  Gui::append(">> JoeClient: Connection closed.");
 }
 
 void Chat::write(const char *message)
@@ -474,5 +470,10 @@ void Chat::removeUser(int line)
       }
     }
   }
+}
+
+bool Chat::isConnected()
+{
+  return connected;
 }
 

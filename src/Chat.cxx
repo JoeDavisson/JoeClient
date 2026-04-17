@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <openssl/ssl.h>
 
 #ifdef WIN32
@@ -91,7 +92,8 @@ namespace
 
       buf[j] = '\0';
 
-      char *current = strtok(buf, "\n");
+      char *p = 0;
+      char *current = strtok_r(buf, "\n", &p);
 
       while (current != 0)
       {
@@ -179,7 +181,7 @@ namespace
           Gui::append("\n");
         }
 
-        current = strtok(0, "\n");
+        current = strtok_r(0, "\n", &p);
 
         if (current == 0)
           break;
@@ -338,6 +340,7 @@ void Chat::connectToServer(const char *address, const int port,
 
   // announcement
   char connect_string[256];
+
   snprintf(connect_string, sizeof(connect_string),
            "%% has connected using JoeClient");
 

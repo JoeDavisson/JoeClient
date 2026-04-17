@@ -493,7 +493,7 @@ void Gui::setLightTheme()
   pm_display->color(fl_rgb_color(240, 240, 240));
   user_display->color(fl_rgb_color(240, 240, 240));
   Dialog::setButtonColor(fl_rgb_color(248, 248, 248));
-  strncpy(url_color, "#000000", sizeof(url_color));
+  strlcpy(url_color, "#000000", sizeof(url_color));
   linkColor();
   Fl::scheme("gtk+");
   getWindow()->redraw();
@@ -514,7 +514,7 @@ void Gui::setDarkTheme()
   pm_display->color(fl_rgb_color(24, 24, 24));
   user_display->color(fl_rgb_color(24, 24, 24));
   Dialog::setButtonColor(fl_rgb_color(32, 32, 32));
-  strncpy(url_color, "#ffffff", sizeof(url_color));
+  strlcpy(url_color, "#ffffff", sizeof(url_color));
   linkColor();
   Fl::scheme("gtk+");
   getWindow()->redraw();

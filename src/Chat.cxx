@@ -171,7 +171,7 @@ namespace
             url_end = strchr(url_start, '\0');
 
           const int length = url_end - url_start;
-          strncpy(url_buf, url_start, length);
+          strlcpy(url_buf, url_start, length);
           Gui::appendURL(url_buf);
         }
 
@@ -442,7 +442,7 @@ void Chat::addUser(int line, const char *name)
 {
   if (line >= 0 && line < MAX_USERS)
   {
-    strncpy(user_list[line].name, name, sizeof(user_list[line].name));
+    strlcpy(user_list[line].name, name, sizeof(user_list[line].name));
     user_list[line].active = true;
 
     Gui::clearUsers();

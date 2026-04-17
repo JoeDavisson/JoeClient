@@ -51,10 +51,20 @@ namespace
   Fl_Group *input_group;
   Fl_Box *input_bracket;
 
+  Fl_Text_Display::Style_Table_Entry style_table[] =
+  {
+    { 0x00000000, FL_SCREEN, 16 },
+    { 0xaa333300, FL_SCREEN, 16 },
+    { 0x33aa3300, FL_SCREEN, 16 },
+    { 0x3333aa00, FL_SCREEN, 16 }
+  };
+
   Fl_Text_Buffer *server_text;
+  Fl_Text_Buffer *server_style;
   Fl_Text_Buffer *user_text;
   Fl_Text_Buffer *url_text;
   Fl_Text_Buffer *pm_text;
+
 
   Fl_Text_Display *server_display;
   Fl_Text_Display *user_display;
@@ -220,10 +230,10 @@ void Gui::init()
     (Fl_Callback *)Dialog::about, 0, 0);
 
   server_text = new Fl_Text_Buffer();
+  server_style = new Fl_Text_Buffer();
   user_text = new Fl_Text_Buffer();
   url_text = new Fl_Text_Buffer();
   pm_text = new Fl_Text_Buffer();
-
   
   // vertical group
   vertical = new Fl_Tile(0, menubar->h(),
@@ -271,6 +281,8 @@ void Gui::init()
   server_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   server_display->scrollbar_size(18);
   server_display->buffer(server_text);
+  server_display->highlight_data(server_style, style_table, 4, 'D', 0, 0);
+
 
   top_left->resizable(server_display);
   top_left->end();
@@ -350,7 +362,37 @@ Fl_Menu_Bar *Gui::getMenuBar()
 
 void Gui::append(const char *text)
 {
+  int utf_len = strlen(text);
+  char style_buf[utf_len + 1];
+  char *p = (char *)text;
+  char *q = style_buf;
+  char current_style = 'A';
+
+  for (int j = 0; j < fl_utf_nb_char((const unsigned char *)text, utf_len); j++)
+  {
+    int len = fl_utf8len1(*p);
+
+    if (len < 1)
+    {
+      len = 1;
+    }
+
+    if (*p == '\n')
+    {
+      *q++ = '\n';
+    }
+      else
+    {
+      *q++ = current_style;
+    }
+
+    p += len;
+  }
+
+  *q = '\0';
+
   server_text->append(text); 
+  server_style->append(style_buf);
 
   int lines = server_text->count_lines(0, server_text->length());
 
@@ -359,6 +401,10 @@ void Gui::append(const char *text)
   {
     server_text->remove(server_text->line_start(1),
                         server_text->line_end(1) + 1);
+
+    server_style->remove(server_style->line_start(1),
+                         server_style->line_end(1) + 1);
+
     lines--;
   }
 

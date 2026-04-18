@@ -230,10 +230,19 @@ void Gui::init()
     (Fl_Callback *)Dialog::about, 0, 0);
 
   server_text = new Fl_Text_Buffer();
+  server_text->canUndo(0);
+
   server_style = new Fl_Text_Buffer();
+  server_style->canUndo(0);
+
   user_text = new Fl_Text_Buffer();
+  user_text->canUndo(0);
+
   url_text = new Fl_Text_Buffer();
+  url_text->canUndo(0);
+
   pm_text = new Fl_Text_Buffer();
+  pm_text->canUndo(0);
   
   // vertical group
   vertical = new Fl_Tile(0, menubar->h(),

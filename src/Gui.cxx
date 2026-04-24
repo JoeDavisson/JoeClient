@@ -53,18 +53,23 @@ namespace
 
   Fl_Text_Display::Style_Table_Entry style_table[] =
   {
-    { 0x00000000, FL_SCREEN, 16 },
-    { 0xaa333300, FL_SCREEN, 16 },
-    { 0x33aa3300, FL_SCREEN, 16 },
-    { 0x3333aa00, FL_SCREEN, 16 }
+    { 0x00000000, FL_HELVETICA, 16 },
+    { 0x77777700, FL_HELVETICA_ITALIC, 16 },
+    { 0x00000000, FL_HELVETICA_BOLD, 16 },
+    { 0x00000000, FL_HELVETICA, 16 },
+    { 0x77777700, FL_HELVETICA_ITALIC, 16 },
+    { 0x00000000, FL_HELVETICA, 16 },
+    { 0x00000000, FL_HELVETICA, 16 }
   };
+
+  const int style_table_size = sizeof(style_table) / sizeof(style_table[0]);
 
   Fl_Text_Buffer *server_text;
   Fl_Text_Buffer *server_style;
   Fl_Text_Buffer *user_text;
+  Fl_Text_Buffer *user_style;
   Fl_Text_Buffer *url_text;
   Fl_Text_Buffer *pm_text;
-
 
   Fl_Text_Display *server_display;
   Fl_Text_Display *user_display;
@@ -231,12 +236,13 @@ void Gui::init()
 
   server_text = new Fl_Text_Buffer();
   server_text->canUndo(0);
-
   server_style = new Fl_Text_Buffer();
   server_style->canUndo(0);
 
   user_text = new Fl_Text_Buffer();
   user_text->canUndo(0);
+  user_style = new Fl_Text_Buffer();
+  user_style->canUndo(0);
 
   url_text = new Fl_Text_Buffer();
   url_text->canUndo(0);
@@ -260,6 +266,8 @@ void Gui::init()
   user_display->textsize(16);
   user_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   user_display->buffer(user_text);
+  user_display->highlight_data(user_style, style_table, style_table_size,
+                               'A', 0, 0);
   top->size_range(user_display, 96, 256);
 
   top_left = new Fl_Group(0, menubar->h(),
@@ -290,8 +298,8 @@ void Gui::init()
   server_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   server_display->scrollbar_size(18);
   server_display->buffer(server_text);
-  server_display->highlight_data(server_style, style_table, 4, 'D', 0, 0);
-
+  server_display->highlight_data(server_style, style_table, style_table_size,
+                                 'A', 0, 0);
 
   top_left->resizable(server_display);
   top_left->end();
@@ -371,49 +379,87 @@ Fl_Menu_Bar *Gui::getMenuBar()
 
 void Gui::append(const char *text)
 {
-  int utf_len = strlen(text);
+  const int utf_len = strlen(text);
   char style_buf[utf_len + 1];
-  char *p = (char *)text;
-  char *q = style_buf;
-  char current_style = 'A';
+  char current_style = Gui::TEXT;
+  int user_highlight = 0;
+  int index = 0;
 
-  for (int j = 0; j < fl_utf_nb_char((const unsigned char *)text, utf_len); j++)
+  while (true)
   {
-    int len = fl_utf8len1(*p);
+    int len = fl_utf8len1(text[index]);
 
-    if (len < 1)
+    if (text[index] == '\n' || text[index] == '\r')
     {
-      len = 1;
-    }
-
-    if (*p == '\n')
-    {
-      *q++ = '\n';
+      style_buf[index] = '\n';
+      index++;
+      break;
     }
       else
     {
-      *q++ = current_style;
+      if (user_highlight == 0 && index == 0)
+      {
+        if (text[index] == '(')
+        {
+          current_style = Gui::CONNECTED;
+          user_highlight = 2;
+        }
+        if (text[index] == '[')
+        {
+          current_style = Gui::USER_LINE;
+          user_highlight = 1;
+        }
+        else if (text[index] == '>' && text[index + 1] == '>')
+        {
+          current_style = Gui::INFO;
+          user_highlight = 2;
+        }
+      }
+      else if (user_highlight == 1 && index > 0)
+      {
+        if (text[index - 1] == ']')
+        {
+          current_style = Gui::USER_LINE;
+        }
+        else if (text[index - 1] == ' ')
+        {
+          current_style = Gui::TEXT;
+          user_highlight = 2;
+        }
+      }
+
+      style_buf[index] = current_style;
+
+      if (len > 1)
+      {
+        for (int i = 1; i < len; i++)
+        {
+          style_buf[index + i] = current_style;
+        }
+      }
     }
 
-    p += len;
+    index += len;
+
+    if (index >= utf_len)
+    {
+      index = utf_len;
+      break;
+    }
   }
 
-  *q = '\0';
-
+  style_buf[index] = '\0';
   server_text->append(text); 
   server_style->append(style_buf);
 
   int lines = server_text->count_lines(0, server_text->length());
 
-  // limit scrollback buffer to 1000 lines
-  while (lines > 1000)
+  while (lines > 66)
   {
-    server_text->remove(server_text->line_start(1),
-                        server_text->line_end(1) + 1);
+    const int num = server_text->line_end(1);
 
-    server_style->remove(server_style->line_start(1),
-                         server_style->line_end(1) + 1);
-
+    server_text->remove(0, num);
+    server_style->remove(0, num);
     lines--;
   }
 
@@ -424,21 +470,78 @@ void Gui::append(const char *text)
 
 void Gui::appendUser(int line, const char *name)
 {
-  char buf[32];
+  char text[256];
 
-  snprintf(buf, sizeof(buf), "[%d] %s", line, name);
-  user_text->append(buf); 
+  snprintf(text, sizeof(text), "[%d] %s", line, name);
 
-  if (name[strlen(buf) - 1] != '\n')
+  const int utf_len = strlen(text);
+  char style_buf[utf_len + 1];
+  char current_style = Gui::TEXT;
+  int user_highlight = 0;
+  int index = 0;
+
+  while (true)
+  {
+    int len = fl_utf8len1(text[index]);
+
+    if (text[index] == '\n' || text[index] == '\r')
+    {
+      style_buf[index] = '\n';
+      index++;
+      break;
+    }
+      else
+    {
+      if (user_highlight == 0)
+      {
+        if (text[index] == '[')
+        {
+          current_style = Gui::USER_LINE;
+          user_highlight = 1;
+        }
+      }
+      else if (user_highlight == 1 && text[index] == ' ')
+      {
+        current_style = Gui::USER_NAME;
+        user_highlight = 2;
+      } 
+
+      style_buf[index] = current_style;
+
+      if (len > 1)
+      {
+        for (int i = 1; i < len; i++)
+        {
+          style_buf[index + i] = current_style;
+        }
+      }
+    }
+
+    index += len;
+
+    if (index >= utf_len)
+    {
+      index = utf_len;
+      break;
+    }
+  }
+
+  style_buf[index] = '\0';
+  user_text->append(text); 
+  user_style->append(style_buf);
+
+  if (name[strlen(text) - 1] != '\n')
     user_text->append("\n"); 
 
   int lines = user_text->count_lines(0, user_text->length());
 
-  // limit scrollback buffer to 100 lines
+  // limit scrollback buffer to 50 lines
   while (lines > 50)
   {
-    user_text->remove(user_text->line_start(1),
-                      user_text->line_end(1) + 1);
+    const int num = user_text->line_end(1);
+
+    user_text->remove(0, num);
+    user_style->remove(0, num);
     lines--;
   }
 
@@ -460,8 +563,10 @@ void Gui::appendURL(const char *text)
   // limit scrollback buffer to 50 lines
   while (lines > 50)
   {
-    url_text->remove(url_text->line_start(1),
-                     url_text->line_end(1) + 1);
+    const int num = url_text->line_end(1);
+
+    url_text->remove(0, num);
+    //url_style->remove(0, num);
     lines--;
   }
 
@@ -479,11 +584,13 @@ void Gui::appendPM(const char *text)
 
   int lines = pm_text->count_lines(0, pm_text->length());
 
-  // limit scrollback buffer to 100 lines
-  while (lines > 100)
+  // limit scrollback buffer to 50 lines
+  while (lines > 50)
   {
-    pm_text->remove(pm_text->line_start(1),
-                    pm_text->line_end(1) + 1);
+    const int num = pm_text->line_end(1);
+
+    pm_text->remove(0, num);
+    //pm_style->remove(0, num);
     lines--;
   }
 
@@ -577,25 +684,46 @@ void Gui::setDarkTheme()
 
 void Gui::setFontSmall()
 {
-  server_display->textsize(14);
-  server_display->buffer(0);
-  server_display->buffer(server_text);
-  server_display->redraw();
+  for (int i = 0; i < style_table_size; i++)
+  {
+    style_table[i].size = 14;
+  }
+
+  user_display->highlight_data(user_style, style_table, style_table_size,
+                               'A', 0, 0);
+  server_display->highlight_data(server_style, style_table, style_table_size,
+                                 'A', 0, 0);
+  url_display->textsize(14);
+  window->redraw();
 }
 
 void Gui::setFontMedium()
 {
-  server_display->textsize(16);
-  server_display->buffer(0);
-  server_display->buffer(server_text);
-  server_display->redraw();
+  for (int i = 0; i < style_table_size; i++)
+  {
+    style_table[i].size = 16;
+  }
+
+  user_display->highlight_data(user_style, style_table, style_table_size,
+                               'A', 0, 0);
+  server_display->highlight_data(server_style, style_table, style_table_size,
+                                 'A', 0, 0);
+  url_display->textsize(16);
+  window->redraw();
 }
 
 void Gui::setFontLarge()
 {
-  server_display->textsize(18);
-  server_display->buffer(0);
-  server_display->buffer(server_text);
-  server_display->redraw();
+  for (int i = 0; i < style_table_size; i++)
+  {
+    style_table[i].size = 18;
+  }
+
+  user_display->highlight_data(user_style, style_table, style_table_size,
+                               'A', 0, 0);
+  server_display->highlight_data(server_style, style_table, style_table_size,
+                                 'A', 0, 0);
+  url_display->textsize(18);
+  window->redraw();
 }
 

@@ -27,6 +27,17 @@ class Fl_Menu_Bar;
 class Gui
 {
 public:
+  enum
+  {
+    TEXT = 'A',
+    INFO = 'B',
+    USER_LINE = 'C',
+    USER_NAME = 'D',
+    CONNECTED = 'E',
+    EMOTE = 'F',
+    YELL = 'G'
+  };
+
   static void init();
   static void show();
   static void setMenuItem(const char *);

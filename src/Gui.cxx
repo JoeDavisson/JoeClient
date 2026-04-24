@@ -67,7 +67,6 @@ namespace
   Fl_Text_Buffer *server_text;
   Fl_Text_Buffer *server_style;
   Fl_Text_Buffer *user_text;
-  Fl_Text_Buffer *user_style;
   Fl_Text_Buffer *url_text;
   Fl_Text_Buffer *pm_text;
 
@@ -241,8 +240,6 @@ void Gui::init()
 
   user_text = new Fl_Text_Buffer();
   user_text->canUndo(0);
-  user_style = new Fl_Text_Buffer();
-  user_style->canUndo(0);
 
   url_text = new Fl_Text_Buffer();
   url_text->canUndo(0);
@@ -266,8 +263,6 @@ void Gui::init()
   user_display->textsize(16);
   user_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   user_display->buffer(user_text);
-  user_display->highlight_data(user_style, style_table, style_table_size,
-                               'A', 0, 0);
   top->size_range(user_display, 96, 256);
 
   top_left = new Fl_Group(0, menubar->h(),
@@ -474,66 +469,11 @@ void Gui::appendUser(int line, const char *name)
 
   snprintf(text, sizeof(text), "[%d] %s", line, name);
 
-  const int utf_len = strlen(text);
-  char style_buf[utf_len + 1];
-  char current_style = Gui::TEXT;
-  int user_highlight = 0;
-  int index = 0;
-
-  while (true)
-  {
-    int len = fl_utf8len1(text[index]);
-
-    if (text[index] == '\n' || text[index] == '\r')
-    {
-      style_buf[index] = '\n';
-      index++;
-      break;
-    }
-      else
-    {
-      if (user_highlight == 0)
-      {
-        if (text[index] == '[')
-        {
-          current_style = Gui::USER_LINE;
-          user_highlight = 1;
-        }
-      }
-      else if (user_highlight == 1 && text[index] == ' ')
-      {
-        current_style = Gui::USER_NAME;
-        user_highlight = 2;
-      } 
-
-      style_buf[index] = current_style;
-
-      if (len > 1)
-      {
-        for (int i = 1; i < len; i++)
-        {
-          style_buf[index + i] = current_style;
-        }
-      }
-    }
-
-    index += len;
-
-    if (index >= utf_len)
-    {
-      index = utf_len;
-      break;
-    }
-  }
-
-  style_buf[index] = '\0';
   user_text->append(text); 
-  user_style->append(style_buf);
 
   if (name[strlen(text) - 1] != '\n')
   {
     user_text->append("\n"); 
-    user_style->append("\n"); 
   }
 
   int lines = user_text->count_lines(0, user_text->length());
@@ -544,7 +484,6 @@ void Gui::appendUser(int line, const char *name)
     const int num = user_text->line_end(1);
 
     user_text->remove(0, num);
-    user_style->remove(0, num);
     lines--;
   }
 
@@ -569,7 +508,6 @@ void Gui::appendURL(const char *text)
     const int num = url_text->line_end(1);
 
     url_text->remove(0, num);
-    //url_style->remove(0, num);
     lines--;
   }
 
@@ -593,7 +531,6 @@ void Gui::appendPM(const char *text)
     const int num = pm_text->line_end(1);
 
     pm_text->remove(0, num);
-    //pm_style->remove(0, num);
     lines--;
   }
 
@@ -692,8 +629,6 @@ void Gui::setFontSmall()
     style_table[i].size = 14;
   }
 
-  user_display->highlight_data(user_style, style_table, style_table_size,
-                               'A', 0, 0);
   server_display->highlight_data(server_style, style_table, style_table_size,
                                  'A', 0, 0);
   url_display->textsize(14);
@@ -707,8 +642,6 @@ void Gui::setFontMedium()
     style_table[i].size = 16;
   }
 
-  user_display->highlight_data(user_style, style_table, style_table_size,
-                               'A', 0, 0);
   server_display->highlight_data(server_style, style_table, style_table_size,
                                  'A', 0, 0);
   url_display->textsize(16);
@@ -722,8 +655,6 @@ void Gui::setFontLarge()
     style_table[i].size = 18;
   }
 
-  user_display->highlight_data(user_style, style_table, style_table_size,
-                               'A', 0, 0);
   server_display->highlight_data(server_style, style_table, style_table_size,
                                  'A', 0, 0);
   url_display->textsize(18);

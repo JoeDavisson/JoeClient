@@ -531,7 +531,10 @@ void Gui::appendUser(int line, const char *name)
   user_style->append(style_buf);
 
   if (name[strlen(text) - 1] != '\n')
+  {
     user_text->append("\n"); 
+    user_style->append("\n"); 
+  }
 
   int lines = user_text->count_lines(0, user_text->length());
 

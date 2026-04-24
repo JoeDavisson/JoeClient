@@ -34,7 +34,7 @@ CheckBox::CheckBox(Fl_Group *g, int x, int y, int w, int h,
   int ww = 0, hh = 0;
 
   group = g;
-  clear_visible_focus();
+//  clear_visible_focus();
   labelsize(18);
 
   if (cb)

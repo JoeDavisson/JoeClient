@@ -48,7 +48,8 @@ OBJ= \
   $(SRC_DIR)/Dialog.o \
   $(SRC_DIR)/DialogWindow.o \
   $(SRC_DIR)/Gui.o \
-  $(SRC_DIR)/Separator.o
+  $(SRC_DIR)/Separator.o \
+  $(SRC_DIR)/StyledText.o
 
 # build program
 default: $(OBJ)

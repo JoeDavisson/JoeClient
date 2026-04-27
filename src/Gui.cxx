@@ -33,6 +33,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include "Chat.H"
 #include "Dialog.H"
 #include "Gui.H"
+#include "StyledText.H"
 
 class MainWin;
 
@@ -64,13 +65,14 @@ namespace
 
   const int style_table_size = sizeof(style_table) / sizeof(style_table[0]);
 
-  Fl_Text_Buffer *server_text;
-  Fl_Text_Buffer *server_style;
+//  Fl_Text_Buffer *server_text;
+//  Fl_Text_Buffer *server_style;
   Fl_Text_Buffer *user_text;
   Fl_Text_Buffer *url_text;
   Fl_Text_Buffer *pm_text;
 
-  Fl_Text_Display *server_display;
+//  Fl_Text_Display *server_display;
+  StyledText *server_display;
   Fl_Text_Display *user_display;
   Fl_Help_View *url_display;
   Fl_Text_Display *pm_display;
@@ -99,7 +101,9 @@ namespace
       else
     {
       if (Dialog::choice("Quit", "Are You Sure?"))
+      {
         widget->hide();
+      }
     }
   }
 }
@@ -233,11 +237,6 @@ void Gui::init()
   menubar->add("&Help/&About", 0,
     (Fl_Callback *)Dialog::about, 0, 0);
 
-  server_text = new Fl_Text_Buffer();
-  server_text->canUndo(0);
-  server_style = new Fl_Text_Buffer();
-  server_style->canUndo(0);
-
   user_text = new Fl_Text_Buffer();
   user_text->canUndo(0);
 
@@ -284,17 +283,11 @@ void Gui::init()
   input_group->resizable(input_field);
   input_group->end();
 
-  server_display = new Fl_Text_Display(top_left->x(),
-                                       top_left->y(),
-                                       top_left->w(),
-                                       top_left->h() - input_field->h());
-
-  server_display->box(FL_UP_BOX);
-  server_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-  server_display->scrollbar_size(18);
-  server_display->buffer(server_text);
-  server_display->highlight_data(server_style, style_table, style_table_size,
-                                 'A', 0, 0);
+  server_display = new StyledText(top_left->x(),
+                                  top_left->y(),
+                                  top_left->w(),
+                                  top_left->h() - input_field->h(),
+                                  1000);
 
   top_left->resizable(server_display);
   top_left->end();
@@ -374,93 +367,24 @@ Fl_Menu_Bar *Gui::getMenuBar()
 
 void Gui::append(const char *text)
 {
-  const int utf_len = strlen(text);
-  char style_buf[utf_len + 1];
-  char current_style = Gui::TEXT;
-  int user_highlight = 0;
-  int index = 0;
+  const char c = text[0];
 
-  while (true)
+  if (c == '[')
   {
-    int len = fl_utf8len1(text[index]);
-
-    if (text[index] == '\n' || text[index] == '\r')
-    {
-      style_buf[index] = '\n';
-      index++;
-      break;
-    }
-      else
-    {
-      if (user_highlight == 0 && index == 0)
-      {
-        if (text[index] == '(')
-        {
-          current_style = Gui::CONNECTED;
-          user_highlight = 2;
-        }
-        if (text[index] == '[')
-        {
-          current_style = Gui::USER_LINE;
-          user_highlight = 1;
-        }
-        else if (text[index] == '>' && text[index + 1] == '>')
-        {
-          current_style = Gui::INFO;
-          user_highlight = 2;
-        }
-      }
-      else if (user_highlight == 1 && index > 0)
-      {
-        if (text[index - 1] == ']')
-        {
-          current_style = Gui::USER_LINE;
-        }
-        else if (text[index - 1] == ' ')
-        {
-          current_style = Gui::TEXT;
-          user_highlight = 2;
-        }
-      }
-
-      style_buf[index] = current_style;
-
-      if (len > 1)
-      {
-        for (int i = 1; i < len; i++)
-        {
-          style_buf[index + i] = current_style;
-        }
-      }
-    }
-
-    index += len;
-
-    if (index >= utf_len)
-    {
-      index = utf_len;
-      break;
-    }
+    server_display->append(text, "[", ": ", 'C', 'A');
   }
-
-  style_buf[index] = '\0';
-  server_text->append(text); 
-  server_style->append(style_buf);
-
-  int lines = server_text->count_lines(0, server_text->length());
-
-  while (lines > 66)
+  else if (c == '>')
   {
-    const int num = server_text->line_end(1);
-
-    server_text->remove(0, num);
-    server_style->remove(0, num);
-    lines--;
+    server_display->append(text, ">>", "", 'B', 'B');
   }
-
-  // scroll display to bottom
-  server_display->insert_position(server_text->length());
-  server_display->show_insert_position();
+  else if (c == '(')
+  {
+    server_display->append(text, "(", "using", 'B', 'D');
+  }
+    else
+  {
+    server_display->append(text, "", "", 'A', 'A');
+  }
 }
 
 void Gui::appendUser(int line, const char *name)
@@ -624,39 +548,21 @@ void Gui::setDarkTheme()
 
 void Gui::setFontSmall()
 {
-  for (int i = 0; i < style_table_size; i++)
-  {
-    style_table[i].size = 14;
-  }
-
-  server_display->highlight_data(server_style, style_table, style_table_size,
-                                 'A', 0, 0);
+  server_display->setFontSize(14);
   url_display->textsize(14);
   window->redraw();
 }
 
 void Gui::setFontMedium()
 {
-  for (int i = 0; i < style_table_size; i++)
-  {
-    style_table[i].size = 16;
-  }
-
-  server_display->highlight_data(server_style, style_table, style_table_size,
-                                 'A', 0, 0);
+  server_display->setFontSize(16);
   url_display->textsize(16);
   window->redraw();
 }
 
 void Gui::setFontLarge()
 {
-  for (int i = 0; i < style_table_size; i++)
-  {
-    style_table[i].size = 18;
-  }
-
-  server_display->highlight_data(server_style, style_table, style_table_size,
-                                 'A', 0, 0);
+  server_display->setFontSize(18);
   url_display->textsize(18);
   window->redraw();
 }

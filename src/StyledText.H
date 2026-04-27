@@ -18,39 +18,20 @@ along with JoeClient; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#ifndef GUI_H
-#define GUI_H
+#ifndef STYLEDTEXT_H
+#define STYLEDTEXT_H
 
-class Fl_Double_Window;
-class Fl_Menu_Bar;
+#include <FL/Fl_Text_Display.H>
 
-class Gui
+class StyledText : public Fl_Text_Display
 {
 public:
-  static void init();
-  static void show();
-  static void setMenuItem(const char *);
-  static void clearMenuItem(const char *);
-  static Fl_Double_Window *getWindow();
-  static Fl_Menu_Bar *getMenuBar();
-  static void append(const char *);
-  static void appendUser(int, const char *);
-  static void appendURL(const char *);
-  static void appendPM(const char *);
-  static void clearUsers();
-  static void clearURLs();
-  static void clearPMs();
-  static void linkColor();
-  static void sendMessage();
-  static void setLightTheme();
-  static void setDarkTheme();
-  static void setFontSmall();
-  static void setFontMedium();
-  static void setFontLarge();
+  StyledText(int, int, int, int, int);
+  ~StyledText();
 
-private:
-  Gui() { }
-  ~Gui() { }
+  void append(const char *, const char *, const char *, const char, const char);
+  void remove(const int, const int);
+  void setFontSize(const int);
 };
 
 #endif

@@ -30,7 +30,7 @@ public:
   ~StyledText();
 
   void append(const char *, const char *, const char *, const char, const char);
-  void remove(const int, const int);
+//  void remove(const int, const int);
   void setFontSize(const int);
 };
 

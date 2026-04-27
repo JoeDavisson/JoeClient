@@ -113,9 +113,17 @@ void StyledText::append(const char *text,
       {
         current_style = style2;
       }
-    }
 
-    buf[index] = current_style;
+      buf[index] = current_style;
+
+      if (len > 1)
+      {
+        for (int i = 1; i < len; i++)
+        {
+          buf[index + i] = current_style;
+        }
+      }
+    }
 
     index += len;
 
@@ -146,11 +154,13 @@ void StyledText::append(const char *text,
   show_insert_position();
 }
 
+/*
 void StyledText::remove(const int start, const int end)
 {
   text_buf->remove(start, end);
   style_buf->remove(start, end);
 }
+*/
 
 void StyledText::setFontSize(const int size)
 {

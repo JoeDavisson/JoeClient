@@ -196,8 +196,8 @@ namespace
   void chat_read(FL_SOCKET sockfd, void *)
   {
     memset(buf, 0, sizeof(buf));
-    memset(temp_buf, 0, sizeof(buf));
-    memset(url_buf, 0, sizeof(buf));
+    memset(temp_buf, 0, sizeof(temp_buf));
+    memset(url_buf, 0, sizeof(url_buf));
 
     int size = recv(sockfd, temp_buf, sizeof(temp_buf), 0);
     handle_msg(size);
@@ -206,8 +206,8 @@ namespace
   void chat_read_ssl(FL_SOCKET, void *)
   {
     memset(buf, 0, sizeof(buf));
-    memset(temp_buf, 0, sizeof(buf));
-    memset(url_buf, 0, sizeof(buf));
+    memset(temp_buf, 0, sizeof(temp_buf));
+    memset(url_buf, 0, sizeof(url_buf));
 
     int size = SSL_read(ssl, temp_buf, sizeof(temp_buf));
     handle_msg(size);

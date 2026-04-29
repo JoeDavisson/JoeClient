@@ -59,8 +59,8 @@ default: $(OBJ)
 fltklib:
 	cd ./$(FLTK_DIR); \
 	make clean; \
-	./configure --host=$(HOST) --enable-xft --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
-	make -j4; \
+	./configure --host=$(HOST) --enable-pango --enable-xft --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
+	make -j12; \
 	cd ..; \
 	echo "FLTK lib built.";
 

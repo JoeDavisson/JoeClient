@@ -65,17 +65,12 @@ namespace
 
   const int style_table_size = sizeof(style_table) / sizeof(style_table[0]);
 
-//  Fl_Text_Buffer *server_text;
-//  Fl_Text_Buffer *server_style;
-  Fl_Text_Buffer *user_text;
   Fl_Text_Buffer *url_text;
-  Fl_Text_Buffer *pm_text;
 
-//  Fl_Text_Display *server_display;
   StyledText *server_display;
-  Fl_Text_Display *user_display;
+  StyledText *user_display;
   Fl_Help_View *url_display;
-  Fl_Text_Display *pm_display;
+  StyledText *pm_display;
 
   Fl_Input *input_field;
 
@@ -237,15 +232,9 @@ void Gui::init()
   menubar->add("&Help/&About", 0,
     (Fl_Callback *)Dialog::about, 0, 0);
 
-  user_text = new Fl_Text_Buffer();
-  user_text->canUndo(0);
-
   url_text = new Fl_Text_Buffer();
   url_text->canUndo(0);
 
-  pm_text = new Fl_Text_Buffer();
-  pm_text->canUndo(0);
-  
   // vertical group
   vertical = new Fl_Tile(0, menubar->h(),
                          window->w(), window->h() - menubar->h());
@@ -256,12 +245,9 @@ void Gui::init()
                     window->w(), window->h() - 144 - menubar->h());
   top->box(FL_FLAT_BOX);
 
-  user_display = new Fl_Text_Display(menubar->w() - 128, menubar->h(),
-                               128, top->h());
+  user_display = new StyledText(menubar->w() - 128, menubar->h(),
+                                128, top->h(), 100);
   user_display->box(FL_UP_BOX);
-  user_display->textsize(16);
-  user_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-  user_display->buffer(user_text);
   top->size_range(user_display, 96, 256);
 
   top_left = new Fl_Group(0, menubar->h(),
@@ -288,6 +274,9 @@ void Gui::init()
                                   top_left->w(),
                                   top_left->h() - input_field->h(),
                                   1000);
+  server_display->box(FL_UP_BOX);
+
+  input_field->box(FL_UP_BOX);
 
   top_left->resizable(server_display);
   top_left->end();
@@ -305,13 +294,9 @@ void Gui::init()
   url_display->textsize(16);
   url_display->scrollbar_size(18);
 
-  pm_display = new Fl_Text_Display(bottom->x() + bottom->w() / 2, bottom->y(),
-                                   bottom->w() / 2, bottom->h());
+  pm_display = new StyledText(bottom->x() + bottom->w() / 2, bottom->y(),
+                              bottom->w() / 2, bottom->h(), 100);
   pm_display->box(FL_UP_BOX);
-  pm_display->textsize(16);
-  pm_display->scrollbar_size(18);
-  pm_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-  pm_display->buffer(pm_text);
 
   bottom->end();
 
@@ -383,7 +368,7 @@ void Gui::append(const char *text)
   }
     else
   {
-    server_display->append(text, "", "", 'A', 'A');
+    server_display->append(text);
   }
 }
 
@@ -392,28 +377,12 @@ void Gui::appendUser(int line, const char *name)
   char text[256];
 
   snprintf(text, sizeof(text), "[%d] %s", line, name);
-
-  user_text->append(text); 
+  user_display->append(text); 
 
   if (name[strlen(text) - 1] != '\n')
   {
-    user_text->append("\n"); 
+    user_display->append("\n"); 
   }
-
-  int lines = user_text->count_lines(0, user_text->length());
-
-  // limit scrollback buffer to 50 lines
-  while (lines > 50)
-  {
-    const int num = user_text->line_end(1);
-
-    user_text->remove(0, num);
-    lines--;
-  }
-
-  // scroll display to bottom
-  user_display->insert_position(user_text->length());
-  user_display->show_insert_position();
 }
 
 void Gui::appendURL(const char *text)
@@ -442,30 +411,15 @@ void Gui::appendURL(const char *text)
 
 void Gui::appendPM(const char *text)
 {
-  pm_text->append(text); 
+  pm_display->append(text); 
 
   if (text[strlen(text) - 1] != '\n')
-    pm_text->append("\n"); 
-
-  int lines = pm_text->count_lines(0, pm_text->length());
-
-  // limit scrollback buffer to 50 lines
-  while (lines > 50)
-  {
-    const int num = pm_text->line_end(1);
-
-    pm_text->remove(0, num);
-    lines--;
-  }
-
-  // scroll display to bottom
-  pm_display->insert_position(pm_text->length());
-  pm_display->show_insert_position();
+    pm_display->append("\n"); 
 }
 
 void Gui::clearUsers()
 {
-  user_text->text("");
+  user_display->clear();
 }
 
 void Gui::clearURLs()
@@ -476,7 +430,7 @@ void Gui::clearURLs()
 
 void Gui::clearPMs()
 {
-  pm_text->text("");
+  pm_display->clear();
 }
 
 void Gui::linkColor()
@@ -521,7 +475,6 @@ void Gui::setLightTheme()
   Dialog::setButtonColor(fl_rgb_color(248, 248, 248));
   strlcpy(url_color, "#000000", sizeof(url_color));
   linkColor();
-  Fl::scheme("gtk+");
   getWindow()->redraw();
 }
 
@@ -542,7 +495,6 @@ void Gui::setDarkTheme()
   Dialog::setButtonColor(fl_rgb_color(32, 32, 32));
   strlcpy(url_color, "#ffffff", sizeof(url_color));
   linkColor();
-  Fl::scheme("gtk+");
   getWindow()->redraw();
 }
 

@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 int main(/*int argc, char *argv[]*/)
 {
+  Fl::scheme("gtk+");
   Fl::screen_scale(0, 1.0);
 
 #ifndef WIN32

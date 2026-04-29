@@ -29,9 +29,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 namespace
 {
-  Fl_Text_Buffer *text_buf;
-  Fl_Text_Buffer *style_buf;
-
   Fl_Text_Display::Style_Table_Entry style_table[] =
   {
     { 0x00000000, FL_HELVETICA, 16 },
@@ -44,7 +41,6 @@ namespace
   };
 
   const int style_table_size = sizeof(style_table) / sizeof(style_table[0]);
-  int scrollback_limit = 1000;
 }
 
 StyledText::StyledText(int x, int y, int w, int h, int limit)
@@ -56,6 +52,7 @@ StyledText::StyledText(int x, int y, int w, int h, int limit)
   style_buf->canUndo(0);
   wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
   scrollbar_size(16);
+  textsize(16);
   buffer(text_buf);
   highlight_data(style_buf, style_table, style_table_size, 'A', 0, 0);
   scrollback_limit = limit;
@@ -63,8 +60,17 @@ StyledText::StyledText(int x, int y, int w, int h, int limit)
 
 StyledText::~StyledText()
 {
+  delete text_buf;
+  delete style_buf;
 }
 
+// plain text version
+void StyledText::append(const char *text)
+{
+  append(text, "", "", 'A', 'A');
+}
+
+// styled version
 void StyledText::append(const char *text,
                         const char *match1,
                         const char *match2,
@@ -154,13 +160,11 @@ void StyledText::append(const char *text,
   show_insert_position();
 }
 
-/*
-void StyledText::remove(const int start, const int end)
+void StyledText::clear()
 {
-  text_buf->remove(start, end);
-  style_buf->remove(start, end);
+  text_buf->text("");
+  style_buf->text("");
 }
-*/
 
 void StyledText::setFontSize(const int size)
 {

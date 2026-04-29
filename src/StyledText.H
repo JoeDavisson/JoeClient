@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #ifndef STYLEDTEXT_H
 #define STYLEDTEXT_H
 
+#include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 
 class StyledText : public Fl_Text_Display
@@ -30,8 +31,14 @@ public:
   ~StyledText();
 
   void append(const char *, const char *, const char *, const char, const char);
-//  void remove(const int, const int);
+  void append(const char *);
+  void clear();
   void setFontSize(const int);
+
+private:
+  Fl_Text_Buffer *text_buf;
+  Fl_Text_Buffer *style_buf;
+  int scrollback_limit;
 };
 
 #endif

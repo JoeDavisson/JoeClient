@@ -387,12 +387,10 @@ void Gui::appendUser(int line, const char *name)
 void Gui::appendURL(const char *text)
 {
   url_text->append("<a href=\"");
-  url_text->append("&bsp");
   url_text->append(text);
-  url_text->append("&bsp");
   url_text->append("\">");
   url_text->append(text);
-  url_text->append("</a>\n");
+  url_text->append("</a><br>");
 
   int lines = url_text->count_lines(0, url_text->length() - 1);
 

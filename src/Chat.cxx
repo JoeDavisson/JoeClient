@@ -150,7 +150,7 @@ namespace
 
         // check for url
         char *url_start = 0, *url_end = 0;
-        const char non_url_chars[] = " \"<>#{}|\\^`";
+        const char non_url_chars[] = "\r\n \"<>#{}|\\^`";
 
         if (((url_start = strstr(current, "http://")) != 0) ||
            ((url_start = strstr(current, "https://")) != 0))
@@ -158,21 +158,30 @@ namespace
           // stop at first non-url character
           for (j = 0; j < strlen(current); j++)
           {
-            for (unsigned int i = 0; i < strlen(non_url_chars); i++)
+            for (i = 0; i < strlen(non_url_chars); i++)
             {
               if (current[j] == non_url_chars[i])
               {
-                current[j] = '\0';
+                current[j] = ' ';
                 break;
               }
             }
           }
 
-         if (url_end == 0)
-           url_end = strchr(url_start, '\0');
+          url_end = &current[j];
 
           const int length = url_end - url_start;
-          strlcpy(url_buf, url_start, length);
+          strlcpy(url_buf, url_start, length + 1);
+
+          for (j = 0; j < strlen(current); j++)
+          {
+            if (url_buf[j] == ' ')
+            {
+              url_buf[j] = '\0';
+              break;
+            }
+          }
+
           Gui::appendURL(url_buf);
         }
 

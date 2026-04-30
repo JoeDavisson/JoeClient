@@ -292,7 +292,6 @@ void Gui::init()
                                  bottom->w() / 2, bottom->h());
   url_display->box(FL_UP_BOX);
   url_display->textsize(16);
-  url_display->scrollbar_size(18);
 
   pm_display = new StyledText(bottom->x() + bottom->w() / 2, bottom->y(),
                               bottom->w() / 2, bottom->h(), 100);
@@ -387,13 +386,15 @@ void Gui::appendUser(int line, const char *name)
 
 void Gui::appendURL(const char *text)
 {
-  url_text->append("<a href=\""); 
-  url_text->append(text); 
-  url_text->append("\">"); 
-  url_text->append(text); 
-  url_text->append("</a><br>\n"); 
+  url_text->append("<a href=\"");
+  url_text->append("&bsp");
+  url_text->append(text);
+  url_text->append("&bsp");
+  url_text->append("\">");
+  url_text->append(text);
+  url_text->append("</a>\n");
 
-  int lines = url_text->count_lines(0, url_text->length());
+  int lines = url_text->count_lines(0, url_text->length() - 1);
 
   // limit scrollback buffer to 50 lines
   while (lines > 50)

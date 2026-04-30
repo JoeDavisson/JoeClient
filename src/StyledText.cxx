@@ -144,7 +144,7 @@ void StyledText::append(const char *text,
   text_buf->append(text);
   style_buf->append(buf);
 
-  int lines = text_buf->count_lines(0, text_buf->length());
+  int lines = text_buf->count_lines(0, text_buf->length() - 1);
 
   while (lines > scrollback_limit)
   {

@@ -149,26 +149,27 @@ namespace
         }
 
         // check for url
-        char *url_start, *url_end;
+        char *url_start = 0, *url_end = 0;
+        const char non_url_chars[] = " \"<>#{}|\\^`";
 
         if (((url_start = strstr(current, "http://")) != 0) ||
            ((url_start = strstr(current, "https://")) != 0))
         {
-          // stop at first carriage return
-          for (i = 0; i < strlen(current); i++)
+          // stop at first non-url character
+          for (j = 0; j < strlen(current); j++)
           {
-            if (current[i] == '\n')
+            for (unsigned int i = 0; i < strlen(non_url_chars); i++)
             {
-              current[i] = '\0';
-              break;
+              if (current[j] == non_url_chars[i])
+              {
+                current[j] = '\0';
+                break;
+              }
             }
           }
 
-          // find end of url text or stop at whitespace
-          url_end = strchr(url_start, ' ');
-
-          if (url_end == 0)
-            url_end = strchr(url_start, '\0');
+         if (url_end == 0)
+           url_end = strchr(url_start, '\0');
 
           const int length = url_end - url_start;
           strlcpy(url_buf, url_start, length);

@@ -6,7 +6,7 @@
 # libxft-dev should be installed before compiling FLTK on linux
 # (otherwise you'll have ugly, non-resizable fonts)
 
-FLTK_DIR=fltk-1.4.4
+FLTK_DIR=fltk-1.4.5
 PLATFORM=linux
 #PLATFORM=mingw32
 #PLATFORM=mingw64
@@ -59,7 +59,7 @@ default: $(OBJ)
 fltklib:
 	cd ./$(FLTK_DIR); \
 	make clean; \
-	./configure --host=$(HOST) --enable-pango --enable-xft --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
+	./configure --host=$(HOST) --enable-usecairo --enable-pango --enable-xft --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
 	make -j12; \
 	cd ..; \
 	echo "FLTK lib built.";

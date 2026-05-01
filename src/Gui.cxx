@@ -23,9 +23,10 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Group.H>
-#include <FL/Fl_Help_View.H>
+#include <FL/filename.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Menu_Bar.H>
+#include <FL/Fl_Select_Browser.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Tile.H>
 #include <FL/Fl_Tooltip.H>
@@ -69,7 +70,8 @@ namespace
 
   StyledText *server_display;
   StyledText *user_display;
-  Fl_Help_View *url_display;
+//  Fl_Help_View *url_display;
+  Fl_Select_Browser *url_display;
   StyledText *pm_display;
 
   Fl_Input *input_field;
@@ -192,7 +194,14 @@ public:
   }
 };
 
-// initialize main gui
+void Gui::cb_url()
+{
+  const int line = url_display->value();
+
+  if (line > 0)
+    fl_open_uri(url_display->text(line));
+}
+
 void Gui::init()
 {
   // main window
@@ -288,9 +297,12 @@ void Gui::init()
   // bottom group
   bottom = new Fl_Group(0, window->h() - 144, window->w(), 144);
 
-  url_display = new Fl_Help_View(bottom->x(), bottom->y(),
-                                 bottom->w() / 2, bottom->h());
-  url_display->box(FL_UP_BOX);
+  url_display = new Fl_Select_Browser(bottom->x() + 4, bottom->y() + 4,
+                                      bottom->w() / 2 - 8, bottom->h() - 8, 0);
+//  url_display = new Fl_Select_Browser(bottom->x(), bottom->y(),
+//                                     bottom->w() / 2, bottom->h(), 0);
+  url_display->box(FL_FLAT_BOX);
+  url_display->callback((Fl_Callback *)cb_url);
   url_display->textsize(16);
 
   pm_display = new StyledText(bottom->x() + bottom->w() / 2, bottom->y(),
@@ -386,26 +398,11 @@ void Gui::appendUser(int line, const char *name)
 
 void Gui::appendURL(const char *text)
 {
-  url_text->append("<a href=\"");
-  url_text->append(text);
-  url_text->append("\">");
-  url_text->append(text);
-  url_text->append("</a><br>");
+  if (url_display->size() >= 100)
+    url_display->remove(1);
 
-  int lines = url_text->count_lines(0, url_text->length() - 1);
-
-  // limit scrollback buffer to 50 lines
-  while (lines > 50)
-  {
-    const int num = url_text->line_end(1);
-
-    url_text->remove(0, num);
-    lines--;
-  }
-
-  // scroll display to bottom
-  url_display->value(url_text->text());
-  linkColor();
+  url_display->add(text);
+  url_display->bottomline(url_display->size());
 }
 
 void Gui::appendPM(const char *text)
@@ -424,31 +421,11 @@ void Gui::clearUsers()
 void Gui::clearURLs()
 {
   url_text->text("");
-  linkColor();
 }
 
 void Gui::clearPMs()
 {
   pm_display->clear();
-}
-
-void Gui::linkColor()
-{
-  // remove first line
-  url_text->remove(url_text->line_start(1),
-                   url_text->line_end(1) + 1);
-
-  // make copy of buffer text
-  char *temp = url_text->text();
-
-  url_text->text("");
-  url_text->append("<body link=\"");
-  url_text->append(url_color);
-  url_text->append("\">\n");
-  url_text->append(temp);
-
-  free(temp);
-  url_display->value(url_text->text());
 }
 
 void Gui::sendMessage()
@@ -467,13 +444,12 @@ void Gui::setLightTheme()
  
   menubar->color(fl_rgb_color(240, 240, 240));
   input_field->color(fl_rgb_color(248, 248, 248));
-  server_display->color(fl_rgb_color(248, 248, 248));
+  server_display->bgColor(fl_rgb_color(248, 248, 248));
   url_display->color(fl_rgb_color(240, 240, 240));
-  pm_display->color(fl_rgb_color(240, 240, 240));
-  user_display->color(fl_rgb_color(240, 240, 240));
+  pm_display->bgColor(fl_rgb_color(240, 240, 240));
+  user_display->bgColor(fl_rgb_color(240, 240, 240));
   Dialog::setButtonColor(fl_rgb_color(248, 248, 248));
   strlcpy(url_color, "#000000", sizeof(url_color));
-  linkColor();
   getWindow()->redraw();
 }
 
@@ -487,13 +463,12 @@ void Gui::setDarkTheme()
 
   menubar->color(fl_rgb_color(24, 24, 24));
   input_field->color(fl_rgb_color(16, 16, 16));
-  server_display->color(fl_rgb_color(16, 16, 16));
+  server_display->bgColor(fl_rgb_color(16, 16, 16));
   url_display->color(fl_rgb_color(24, 24, 24));
-  pm_display->color(fl_rgb_color(24, 24, 24));
-  user_display->color(fl_rgb_color(24, 24, 24));
+  pm_display->bgColor(fl_rgb_color(24, 24, 24));
+  user_display->bgColor(fl_rgb_color(24, 24, 24));
   Dialog::setButtonColor(fl_rgb_color(32, 32, 32));
   strlcpy(url_color, "#ffffff", sizeof(url_color));
-  linkColor();
   getWindow()->redraw();
 }
 

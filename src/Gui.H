@@ -27,6 +27,7 @@ class Fl_Menu_Bar;
 class Gui
 {
 public:
+  static void cb_url();
   static void init();
   static void show();
   static void setMenuItem(const char *);
@@ -40,7 +41,6 @@ public:
   static void clearUsers();
   static void clearURLs();
   static void clearPMs();
-  static void linkColor();
   static void sendMessage();
   static void setLightTheme();
   static void setDarkTheme();

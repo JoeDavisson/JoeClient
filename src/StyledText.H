@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/Fl_Text_Buffer.H>
 #include <FL/Fl_Text_Display.H>
 
-class StyledText : public Fl_Text_Display
+class StyledText : public Fl_Group
 {
 public:
   StyledText(int, int, int, int, int);
@@ -34,8 +34,10 @@ public:
   void append(const char *);
   void clear();
   void setFontSize(const int);
+  void bgColor(Fl_Color);
 
 private:
+  Fl_Text_Display *text_display;
   Fl_Text_Buffer *text_buf;
   Fl_Text_Buffer *style_buf;
   int scrollback_limit;

@@ -44,22 +44,28 @@ namespace
 }
 
 StyledText::StyledText(int x, int y, int w, int h, int limit)
-: Fl_Text_Display(x, y, w, h, 0)
+: Fl_Group(x, y, w, h, 0)
 {
+  box(FL_NO_BOX);
+  text_display = new Fl_Text_Display(x + 4, y + 4, w - 8, h - 8);
+  text_display->box(FL_NO_BOX);
   text_buf = new Fl_Text_Buffer();
   text_buf->canUndo(0);
   style_buf = new Fl_Text_Buffer();
   style_buf->canUndo(0);
-  wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
-  scrollbar_size(16);
-  textsize(16);
-  buffer(text_buf);
-  highlight_data(style_buf, style_table, style_table_size, 'A', 0, 0);
+  text_display->wrap_mode(Fl_Text_Display::WRAP_AT_BOUNDS, 0);
+  text_display->scrollbar_size(16);
+  text_display->textsize(16);
+  text_display->buffer(text_buf);
+  text_display->highlight_data(style_buf, style_table, style_table_size,
+                               'A', 0, 0);
   scrollback_limit = limit;
+  this->end();
 }
 
 StyledText::~StyledText()
 {
+  delete text_display;
   delete text_buf;
   delete style_buf;
 }
@@ -156,8 +162,8 @@ void StyledText::append(const char *text,
   }
 
   // scroll display to bottom
-  insert_position(text_buf->length());
-  show_insert_position();
+  text_display->insert_position(text_buf->length());
+  text_display->show_insert_position();
 }
 
 void StyledText::clear()
@@ -173,8 +179,16 @@ void StyledText::setFontSize(const int size)
     style_table[i].size = size;
   } 
 
-  highlight_data(style_buf, style_table, style_table_size, 'A', 0, 0);
+  text_display->highlight_data(style_buf, style_table, style_table_size,
+                               'A', 0, 0);
 }
+
+void StyledText::bgColor(Fl_Color c)
+{
+  this->color(c);
+  text_display->color(c);
+}
+
 
 
 

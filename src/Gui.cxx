@@ -321,6 +321,7 @@ void Gui::init()
   setFontMedium();
   setLightTheme();
   clearURLs();
+  Gui::deactivateMenuItem("&Server/&Disconnect");
 }
 
 // show the main program window (called after gui is constructed)
@@ -490,4 +491,21 @@ void Gui::setFontLarge()
   url_display->textsize(18);
   window->redraw();
 }
+
+void Gui::activateMenuItem(const char *desc)
+{
+  const Fl_Menu_Item *item = menubar->find_item(desc);
+
+  if (item)
+    ((Fl_Menu_Item *)item)->activate();
+}
+
+void Gui::deactivateMenuItem(const char *desc)
+{
+  const Fl_Menu_Item *item = menubar->find_item(desc);
+
+  if (item)
+    ((Fl_Menu_Item *)item)->deactivate();
+}
+
 

@@ -105,10 +105,7 @@ namespace Connect
   void begin()
   {
     if (Chat::isConnected() == true)
-    {
-      Dialog::message("Error", "Already connected to a server.");
       return;
-    }
 
     Items::ok->color(button_color);
     Items::ok->take_focus();

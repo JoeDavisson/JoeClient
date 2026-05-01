@@ -47,6 +47,8 @@ public:
   static void setFontSmall();
   static void setFontMedium();
   static void setFontLarge();
+  static void activateMenuItem(const char *);
+  static void deactivateMenuItem(const char *);
 
 private:
   Gui() { }

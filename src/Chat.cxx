@@ -309,6 +309,9 @@ void Chat::connectToServer(const char *address, const int port,
   }
 #endif
 
+  Gui::deactivateMenuItem("&Server/&Connect...");
+  Gui::activateMenuItem("&Server/&Disconnect");
+
   connected = true;
   enable_ssl = enable_ssl_value;
 
@@ -391,6 +394,9 @@ void Chat::disconnect(const char *title, const char *message)
 #else
     close(sock);
 #endif
+
+    Gui::activateMenuItem("&Server/&Connect...");
+    Gui::deactivateMenuItem("&Server/&Disconnect");
 
     connected = false;
     Dialog::message(title, message);

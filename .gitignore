@@ -3,5 +3,5 @@
 *.exe
 joeclient
 compile_commands.json
-fltk-1.4.4
+fltk*/
 

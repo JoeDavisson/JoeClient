@@ -297,8 +297,8 @@ void Gui::init()
   // bottom group
   bottom = new Fl_Group(0, window->h() - 144, window->w(), 144);
 
-  url_display = new Fl_Select_Browser(bottom->x() + 4, bottom->y() + 4,
-                                      bottom->w() / 2 - 8, bottom->h() - 8, 0);
+  url_display = new Fl_Select_Browser(bottom->x(), bottom->y(),
+                                      bottom->w() / 2, bottom->h(), 0);
   url_display->box(FL_FLAT_BOX);
   url_display->callback((Fl_Callback *)cb_url);
   url_display->textsize(16);

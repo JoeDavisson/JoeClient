@@ -40,8 +40,6 @@ ifeq ($(PLATFORM),mingw64)
   EXE=joeclient.exe
 endif
 
-CXX=g++
-
 OBJ= \
   $(SRC_DIR)/Chat.o \
   $(SRC_DIR)/CheckBox.o \
@@ -49,7 +47,8 @@ OBJ= \
   $(SRC_DIR)/DialogWindow.o \
   $(SRC_DIR)/Gui.o \
   $(SRC_DIR)/Separator.o \
-  $(SRC_DIR)/StyledText.o
+  $(SRC_DIR)/StyledText.o \
+  $(SRC_DIR)/UrlBrowse.o
 
 # build program
 default: $(OBJ)

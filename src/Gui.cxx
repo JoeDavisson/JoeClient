@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/fl_draw.H>
+#include <FL/Fl_Flex.H>
 #include <FL/Fl_Group.H>
 #include <FL/filename.H>
 #include <FL/Fl_Input.H>
@@ -67,12 +68,8 @@ namespace
 
   const int style_table_size = sizeof(style_table) / sizeof(style_table[0]);
 
-  Fl_Text_Buffer *url_text;
-
   StyledText *server_display;
   StyledText *user_display;
-//  Fl_Help_View *url_display;
-//  Fl_Select_Browser *url_display;
   UrlBrowse *url_display;
   StyledText *pm_display;
 
@@ -243,9 +240,6 @@ void Gui::init()
   menubar->add("&Help/&About", 0,
     (Fl_Callback *)Dialog::about, 0, 0);
 
-  url_text = new Fl_Text_Buffer();
-  url_text->canUndo(0);
-
   // vertical group
   vertical = new Fl_Tile(0, menubar->h(),
                          window->w(), window->h() - menubar->h());
@@ -303,10 +297,11 @@ void Gui::init()
                               bottom->w() / 2, bottom->h());
   url_display->callback((Fl_Callback *)cb_url);
 
-  pm_display = new StyledText(bottom->x() + bottom->w() / 2, bottom->y(),
+  pm_display = new StyledText(bottom->w() / 2, bottom->y(),
                               bottom->w() / 2, bottom->h(), 100);
   pm_display->box(FL_UP_BOX);
 
+  bottom->resizable(bottom);
   bottom->end();
 
   vertical->size_range(top, 640, 384);
@@ -419,7 +414,7 @@ void Gui::clearUsers()
 
 void Gui::clearURLs()
 {
-  url_text->text("");
+  url_display->clear();
 }
 
 void Gui::clearPMs()

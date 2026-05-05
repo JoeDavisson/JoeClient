@@ -46,9 +46,9 @@ namespace
 StyledText::StyledText(int x, int y, int w, int h, int limit)
 : Fl_Group(x, y, w, h, 0)
 {
-  box(FL_NO_BOX);
+  box(FL_FLAT_BOX);
   text_display = new Fl_Text_Display(x + 4, y + 4, w - 8, h - 8);
-  text_display->box(FL_NO_BOX);
+  text_display->box(FL_FLAT_BOX);
   text_buf = new Fl_Text_Buffer();
   text_buf->canUndo(0);
   style_buf = new Fl_Text_Buffer();
@@ -189,6 +189,9 @@ void StyledText::bgColor(const Fl_Color c)
   text_display->color(c);
 }
 
-
-
+void StyledText::resize(int x, int y, int w, int h)
+{
+  Fl_Group::resize(x, y, w, h);
+  text_display->resize(x + 4, y + 4, w - 8, h - 8);
+}
 

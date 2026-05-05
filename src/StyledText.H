@@ -35,6 +35,7 @@ public:
   void clear();
   void setFontSize(const int);
   void bgColor(const Fl_Color);
+  void resize(int, int, int, int);
 
 private:
   Fl_Text_Display *text_display;

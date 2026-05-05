@@ -18,6 +18,7 @@ along with JoeClient; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
+#include <array>
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
@@ -59,10 +60,10 @@ namespace
   SSL_CTX *ctx = 0;
   SSL *ssl = 0;
 
-  char buf[1024];
-  char ip_buf[1024];
-  char url_buf[2048];
-  char temp_buf[1024];
+  std::array<char, 4096> buf{};
+  std::array<char, 4096> ip_buf{};
+  std::array<char, 4096> url_buf{};
+  std::array<char, 4096> temp_buf{};
 
   bool connected = false;
   bool enable_ssl = false;
@@ -72,7 +73,7 @@ namespace
 
   struct user_type
   {
-    char name[256];
+    std::array<char, 4096> name{};
     bool active;
   };
 
@@ -93,7 +94,7 @@ namespace
       buf[j] = '\0';
 
       char *p = 0;
-      char *current = strtok_r(buf, "\n", &p);
+      char *current = strtok_r(buf.data(), "\n", &p);
 
       while (current != 0)
       {
@@ -171,7 +172,7 @@ namespace
           url_end = &current[j];
 
           const int length = url_end - url_start;
-          strlcpy(url_buf, url_start, length + 1);
+          strlcpy(url_buf.data(), url_start, length + 1);
 
           for (j = 0; j < strlen(current); j++)
           {
@@ -182,7 +183,7 @@ namespace
             }
           }
 
-          Gui::appendURL(url_buf);
+          Gui::appendURL(url_buf.data());
         }
 
         if (write_line == true)
@@ -205,21 +206,21 @@ namespace
 
   void chat_read(FL_SOCKET sockfd, void *)
   {
-    memset(buf, 0, sizeof(buf));
-    memset(temp_buf, 0, sizeof(temp_buf));
-    memset(url_buf, 0, sizeof(url_buf));
+    buf.fill(0);
+    temp_buf.fill(0);
+    url_buf.fill(0);
 
-    int size = recv(sockfd, temp_buf, sizeof(temp_buf), 0);
+    int size = recv(sockfd, temp_buf.data(), temp_buf.size(), 0);
     handle_msg(size);
   }
 
   void chat_read_ssl(FL_SOCKET, void *)
   {
-    memset(buf, 0, sizeof(buf));
-    memset(temp_buf, 0, sizeof(temp_buf));
-    memset(url_buf, 0, sizeof(url_buf));
+    buf.fill(0);
+    temp_buf.fill(0);
+    url_buf.fill(0);
 
-    int size = SSL_read(ssl, temp_buf, sizeof(temp_buf));
+    int size = SSL_read(ssl, temp_buf.data(), temp_buf.size());
     handle_msg(size);
   }
 }
@@ -254,10 +255,10 @@ void Chat::connectToServer(const char *address, const int port,
 
   // convert host name to IP address
   getnameinfo(ip_info->ai_addr, ip_info->ai_addrlen,
-              ip_buf, sizeof(ip_buf), 0, 0, NI_NUMERICHOST);
+              ip_buf.data(), ip_buf.size(), 0, 0, NI_NUMERICHOST);
 
   server.sin_family = AF_INET;
-  server.sin_addr.s_addr = inet_addr(ip_buf);
+  server.sin_addr.s_addr = inet_addr(ip_buf.data());
   server.sin_port = htons(port);
 
   struct addrinfo *p;
@@ -458,7 +459,7 @@ void Chat::addUser(int line, const char *name)
 {
   if (line >= 0 && line < MAX_USERS)
   {
-    strlcpy(user_list[line].name, name, sizeof(user_list[line].name));
+    strlcpy(user_list[line].name.data(), name, user_list[line].name.size());
     user_list[line].active = true;
 
     Gui::clearUsers();
@@ -467,7 +468,7 @@ void Chat::addUser(int line, const char *name)
     {
       if (user_list[i].active == true)
       {
-        Gui::appendUser(i, user_list[i].name);
+        Gui::appendUser(i, user_list[i].name.data());
       }
     }
   }
@@ -485,7 +486,7 @@ void Chat::removeUser(int line)
     {
       if (user_list[i].active == true)
       {
-        Gui::appendUser(i, user_list[i].name);
+        Gui::appendUser(i, user_list[i].name.data());
       }
     }
   }

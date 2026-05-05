@@ -183,7 +183,7 @@ void StyledText::setFontSize(const int size)
                                'A', 0, 0);
 }
 
-void StyledText::bgColor(Fl_Color c)
+void StyledText::bgColor(const Fl_Color c)
 {
   this->color(c);
   text_display->color(c);

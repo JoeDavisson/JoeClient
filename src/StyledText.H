@@ -34,7 +34,7 @@ public:
   void append(const char *);
   void clear();
   void setFontSize(const int);
-  void bgColor(Fl_Color);
+  void bgColor(const Fl_Color);
 
 private:
   Fl_Text_Display *text_display;

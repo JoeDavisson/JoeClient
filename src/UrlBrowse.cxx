@@ -108,7 +108,6 @@ public:
     {
       const int width = item_width(item_at(1));
       const int height = item_height(item_at(1));
-//      const int ypos = (line - 1) * height + height - 2;
       const int ypos = line * height - vposition() % height - 2;
 
       fl_rectf(x(), y() + ypos, width, 2, fl_rgb_color(128, 128, 128));

@@ -366,7 +366,7 @@ void Gui::appendUser(int line, const char *name)
   char text[256];
 
   snprintf(text, sizeof(text), "[%d] %s", line, name);
-  user_display->append(text); 
+  user_display->append(text, "[", "]", 'F', 'A');
 
   if (name[strlen(text) - 1] != '\n')
   {
@@ -385,7 +385,7 @@ void Gui::appendURL(const char *text)
 
 void Gui::appendPM(const char *text)
 {
-  pm_display->append(text); 
+  pm_display->append(text, "<", ":", 'D', 'A');
 
   if (text[strlen(text) - 1] != '\n')
     pm_display->append("\n"); 

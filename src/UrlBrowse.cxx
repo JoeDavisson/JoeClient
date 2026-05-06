@@ -61,7 +61,7 @@ public:
 
         if (p)
         {
-          int index = 0;
+          int index = 1;
 
           for (void *i = item_first(); i; i = item_next(i))
           {
@@ -74,8 +74,6 @@ public:
             index++;
           }
         }
-
-        line -= topline() - 2;
 
         if (line > 0 && line <= size())
         {
@@ -106,9 +104,9 @@ public:
 
     if (line > 0 && line <= size())
     {
-      const int width = item_width(item_at(1));
-      const int height = item_height(item_at(1));
-      const int ypos = line * height - vposition() % height - 2;
+      const int width = item_width(item_at(line));
+      const int height = item_height(item_at(line));
+      const int ypos = (line - topline() + 1) * height - vposition() % height - 2;
 
       fl_rectf(x(), y() + ypos, width, 2, fl_rgb_color(128, 128, 128));
     }

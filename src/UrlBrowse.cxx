@@ -73,7 +73,16 @@ public:
 
         if (line > 0 && line <= size())
         {
-          Gui::getWindow()->cursor(FL_CURSOR_HAND);
+          if (scrollbar.visible() &&
+              (Fl::event_inside(&hscrollbar) == 0) &&
+              (Fl::event_inside(&scrollbar) == 0))
+          {
+            Gui::getWindow()->cursor(FL_CURSOR_HAND);
+          }
+            else
+          {
+            Gui::getWindow()->cursor(FL_CURSOR_DEFAULT);
+          }
         }
           else
         {
@@ -100,12 +109,22 @@ public:
 
     if (line > 0 && line <= size())
     {
-      const int width = item_width(item_at(line));
-      const int height = item_height(item_at(line));
-      const int ypos = (line - topline() + 1) * height
+      int width = item_width(item_at(line));
+
+      if (width > w())
+        width = w();
+
+      if (scrollbar.visible())
+      {
+        width -= scrollbar_size();
+      }
+
+      int height = item_height(item_at(line));
+      int ypos = (line - topline() + 1) * height
                        - vposition() % height - 2;
 
-      fl_rectf(x(), y() + ypos, width, 2, fl_rgb_color(128, 128, 128));
+      if (hscrollbar.visible() && ypos < h() - scrollbar_size())
+        fl_rectf(x(), y() + ypos, width, 2, fl_rgb_color(128, 128, 128));
     }
   }
 };
@@ -117,6 +136,7 @@ UrlBrowse::UrlBrowse(int x, int y, int w, int h)
   url_browse = new Url_Select_Browser(x + 4, y + 4, w - 8, h - 8, 0);
   url_browse->box(FL_FLAT_BOX);
   url_browse->textsize(16);
+  url_browse->scrollbar_size(16);
   this->end();
 }
 

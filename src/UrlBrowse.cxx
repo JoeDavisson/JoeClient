@@ -51,10 +51,8 @@ public:
         return Fl_Select_Browser::handle(event);
       case FL_MOVE:
       case FL_ENTER:
-
         old_line = line;
         p = find_item(Fl::event_y());
-
         line = 0;
 
         if (p)
@@ -76,7 +74,6 @@ public:
         if (line > 0 && line <= size())
         {
           Gui::getWindow()->cursor(FL_CURSOR_HAND);
-        
         }
           else
         {

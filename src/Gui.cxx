@@ -54,28 +54,12 @@ namespace
   Fl_Group *bottom;
   Fl_Group *input_group;
   Fl_Box *input_bracket;
-
-  Fl_Text_Display::Style_Table_Entry style_table[] =
-  {
-    { 0x00000000, FL_HELVETICA, 16 },
-    { 0x77777700, FL_HELVETICA_ITALIC, 16 },
-    { 0x00000000, FL_HELVETICA_BOLD, 16 },
-    { 0x00000000, FL_HELVETICA, 16 },
-    { 0x77777700, FL_HELVETICA_ITALIC, 16 },
-    { 0x00000000, FL_HELVETICA, 16 },
-    { 0x00000000, FL_HELVETICA, 16 }
-  };
-
-  const int style_table_size = sizeof(style_table) / sizeof(style_table[0]);
+  Fl_Input *input_field;
 
   StyledText *server_display;
   StyledText *user_display;
   UrlBrowse *url_display;
   StyledText *pm_display;
-
-  Fl_Input *input_field;
-
-  char url_color[16];
 
   // quit program
   void quit()
@@ -443,7 +427,6 @@ void Gui::setLightTheme()
   pm_display->bgColor(fl_rgb_color(240, 240, 240));
   user_display->bgColor(fl_rgb_color(240, 240, 240));
   Dialog::setButtonColor(fl_rgb_color(248, 248, 248));
-  strlcpy(url_color, "#000000", sizeof(url_color));
   getWindow()->redraw();
 }
 
@@ -462,7 +445,6 @@ void Gui::setDarkTheme()
   pm_display->bgColor(fl_rgb_color(24, 24, 24));
   user_display->bgColor(fl_rgb_color(24, 24, 24));
   Dialog::setButtonColor(fl_rgb_color(32, 32, 32));
-  strlcpy(url_color, "#ffffff", sizeof(url_color));
   getWindow()->redraw();
 }
 

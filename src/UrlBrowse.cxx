@@ -30,9 +30,7 @@ class Url_Select_Browser : public Fl_Select_Browser
 {
 public:
   Url_Select_Browser(int x, int y, int w, int h, const char *label)
-         : Fl_Select_Browser(x, y, w, h, label)
-  {
-  }
+         : Fl_Select_Browser(x, y, w, h, label) { }
 
   ~Url_Select_Browser() { }
 
@@ -77,11 +75,12 @@ public:
 
         if (line > 0 && line <= size())
         {
-          Fl_Window::current()->cursor(FL_CURSOR_HAND);
+          Gui::getWindow()->cursor(FL_CURSOR_HAND);
+        
         }
           else
         {
-          Fl_Window::current()->cursor(FL_CURSOR_DEFAULT);
+          Gui::getWindow()->cursor(FL_CURSOR_DEFAULT);
         }
 
         if (line != old_line)
@@ -106,7 +105,8 @@ public:
     {
       const int width = item_width(item_at(line));
       const int height = item_height(item_at(line));
-      const int ypos = (line - topline() + 1) * height - vposition() % height - 2;
+      const int ypos = (line - topline() + 1) * height
+                       - vposition() % height - 2;
 
       fl_rectf(x(), y() + ypos, width, 2, fl_rgb_color(128, 128, 128));
     }

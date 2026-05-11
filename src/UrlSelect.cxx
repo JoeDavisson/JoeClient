@@ -32,6 +32,7 @@ UrlSelect::UrlSelect(int x, int y, int w, int h, const char *label)
   line = 0;
   old_line = 0;
   can_click = false;
+  type(0);
 }
 
 UrlSelect::~UrlSelect()
@@ -77,12 +78,12 @@ int UrlSelect::handle(int event)
         width = item_width(item_at(line));
         width -= hscrollbar.value();
 
-        if (scrollbar.visible() != 0 && width >= w() - scrollbar_size())
+        if (/*(scrollbar.visible() != 0 &&*/ width >= w() - scrollbar_size())
         {
           width = w() - scrollbar_size();
         }
       
-        if (scrollbar.visible() &&
+        if (/*scrollbar.visible() && */
             Fl::event_inside(&hscrollbar) == 0 &&
             Fl::event_inside(&scrollbar) == 0 &&
             Fl::event_x() > x() &&

@@ -74,8 +74,8 @@ public:
         if (line > 0 && line <= size())
         {
           if (scrollbar.visible() &&
-              (Fl::event_inside(&hscrollbar) == 0) &&
-              (Fl::event_inside(&scrollbar) == 0))
+              Fl::event_inside(&hscrollbar) == 0 &&
+              Fl::event_inside(&scrollbar) == 0)
           {
             Gui::getWindow()->cursor(FL_CURSOR_HAND);
           }
@@ -110,21 +110,20 @@ public:
     if (line > 0 && line <= size())
     {
       int width = item_width(item_at(line));
-
-      if (width > w())
-        width = w();
-
-      if (scrollbar.visible())
-      {
-        width -= scrollbar_size();
-      }
-
       int height = item_height(item_at(line));
-      int ypos = (line - topline() + 1) * height
-                       - vposition() % height - 2;
 
-      if (hscrollbar.visible() && ypos < h() - scrollbar_size())
+      width -= hscrollbar.value();
+
+      if (scrollbar.visible() != 0 && width >= w() - scrollbar_size())
+        width = w() - scrollbar_size();
+      
+      int ypos = (line - topline() + 1) * height
+                       - (vposition() % height) - 2;
+
+      if (ypos < h() - (hscrollbar.visible() != 0 ? scrollbar_size() : 0))
+      {
         fl_rectf(x(), y() + ypos, width, 2, fl_rgb_color(128, 128, 128));
+      }
     }
   }
 };

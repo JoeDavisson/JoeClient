@@ -48,7 +48,8 @@ OBJ= \
   $(SRC_DIR)/Gui.o \
   $(SRC_DIR)/Separator.o \
   $(SRC_DIR)/StyledText.o \
-  $(SRC_DIR)/UrlBrowse.o
+  $(SRC_DIR)/UrlBrowse.o \
+  $(SRC_DIR)/UrlSelect.o
 
 # build program
 default: $(OBJ)

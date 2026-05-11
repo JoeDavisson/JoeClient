@@ -179,6 +179,9 @@ public:
 
 void Gui::cb_url()
 {
+  if (url_display->canClick() == false)
+    return;
+
   const int line = url_display->value();
 
   if (line > 0)

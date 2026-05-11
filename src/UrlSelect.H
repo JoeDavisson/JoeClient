@@ -18,31 +18,25 @@ along with JoeClient; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
-#ifndef URL_BROWSE_H
-#define URL_BROWSE_H
+#ifndef URL_SELECT_H
+#define URL_SELECT_H
 
-#include "UrlSelect.H"
+#include <FL/Fl_Select_Browser.H>
 
-class UrlBrowse : public Fl_Group
+class UrlSelect : public Fl_Select_Browser
 {
 public:
-  UrlBrowse(int, int, int, int);
-  ~UrlBrowse();
+  UrlSelect(int, int, int, int, const char *);
+  ~UrlSelect();
 
-  void add(const char *);
-  void bgColor(const Fl_Color);
-  void bottomline(const int);
-  void callback(Fl_Callback *);
+  int handle(int);
+  void draw();
   bool canClick();
-  void clear();
-  int size();
-  const char *text(const int);
-  void textsize(const int);
-  int value();
-  void resize(int, int, int, int);
 
 private:
-  UrlSelect *url_browse;
+  int line = 0;
+  int old_line = 0;
+  bool can_click = false;
 };
 
 #endif

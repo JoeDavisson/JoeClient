@@ -25,7 +25,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/fl_draw.H>
 #include <FL/Fl_Flex.H>
 #include <FL/Fl_Group.H>
-#include <FL/filename.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Menu_Bar.H>
 #include <FL/Fl_Text_Display.H>
@@ -177,17 +176,6 @@ public:
   }
 };
 
-void Gui::cb_url()
-{
-  if (url_display->canClick() == false)
-    return;
-
-  const int line = url_display->value();
-
-  if (line > 0)
-    fl_open_uri(url_display->text(line));
-}
-
 void Gui::init()
 {
   // main window
@@ -282,7 +270,6 @@ void Gui::init()
 
   url_display = new UrlBrowse(bottom->x(), bottom->y(),
                               bottom->w() / 2, bottom->h());
-  url_display->callback((Fl_Callback *)cb_url);
 
   pm_display = new StyledText(bottom->w() / 2, bottom->y(),
                               bottom->w() / 2, bottom->h(), 100);

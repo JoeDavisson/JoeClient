@@ -27,7 +27,6 @@ class Fl_Menu_Bar;
 class Gui
 {
 public:
-  static void cb_url();
   static void init();
   static void show();
   static void setMenuItem(const char *);

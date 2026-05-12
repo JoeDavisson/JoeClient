@@ -32,7 +32,6 @@ int main(/*int argc, char *argv[]*/)
   Fl::screen_scale(0, 1.0);
 
 #ifndef WIN32
-  // ignore SIGPIPE
   signal(SIGPIPE, SIG_IGN);
 #endif
 

@@ -21,18 +21,18 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/fl_draw.H>
 #include <FL/Fl_Group.H>
 #include <FL/Fl_Double_Window.H>
-#include <FL/Fl_Select_Browser.H>
+#include <FL/Fl_Browser.H>
+#include <FL/filename.H>
 
 #include "Gui.H"
 #include "UrlSelect.H"
 
 UrlSelect::UrlSelect(int x, int y, int w, int h, const char *label)
-          : Fl_Select_Browser(x, y, w, h, label)
+          : Fl_Browser(x, y, w, h, label)
 {
   line = 0;
   old_line = 0;
   can_click = false;
-  type(0);
 }
 
 UrlSelect::~UrlSelect()
@@ -46,11 +46,23 @@ int UrlSelect::handle(int event)
 
   switch (event)
   {
+    case FL_PUSH:
+      return Fl_Browser::handle(event);
     case FL_DRAG:
-      Fl_Window::current()->cursor(FL_CURSOR_DEFAULT);
-      return 1;
+        Gui::getWindow()->cursor(FL_CURSOR_DEFAULT);
+        can_click = false;
+        redraw();
+        return Fl_Browser::handle(event);
     case FL_RELEASE:
-      return Fl_Select_Browser::handle(event);
+      if (can_click == true && line > 0)
+      {
+        fl_open_uri(text(line));
+        return 1;
+      }
+        else
+      {
+        return Fl_Browser::handle(event);
+      }
     case FL_MOVE:
     case FL_ENTER:
       old_line = line;
@@ -76,15 +88,16 @@ int UrlSelect::handle(int event)
       if (line > 0 && line <= size())
       {
         width = item_width(item_at(line));
-        width -= hscrollbar.value();
 
-        if (/*(scrollbar.visible() != 0 &&*/ width >= w() - scrollbar_size())
+        if (hscrollbar.visible())
+          width -= hscrollbar.value();
+
+        if (scrollbar.visible() && width >= w() - scrollbar_size())
         {
           width = w() - scrollbar_size();
         }
       
-        if (/*scrollbar.visible() && */
-            Fl::event_inside(&hscrollbar) == 0 &&
+        if (Fl::event_inside(&hscrollbar) == 0 &&
             Fl::event_inside(&scrollbar) == 0 &&
             Fl::event_x() > x() &&
             Fl::event_x() < width)
@@ -119,12 +132,12 @@ int UrlSelect::handle(int event)
       return 1;
   }
 
-  return Fl_Select_Browser::handle(event);
+  return Fl_Browser::handle(event);
 }
 
 void UrlSelect::draw()
 {
-  Fl_Select_Browser::draw();
+  Fl_Browser::draw();
 
   if (can_click == false)
     return;

@@ -21,9 +21,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #ifndef URL_SELECT_H
 #define URL_SELECT_H
 
-#include <FL/Fl_Select_Browser.H>
+#include <FL/Fl_Browser.H>
 
-class UrlSelect : public Fl_Select_Browser
+class UrlSelect : public Fl_Browser
 {
 public:
   UrlSelect(int, int, int, int, const char *);

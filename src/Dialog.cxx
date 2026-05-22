@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Flex.H>
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Int_Input.H>
 #include <FL/Fl_Progress.H>
@@ -46,6 +47,7 @@ namespace About
   namespace Items
   {
     DialogWindow *dialog;
+    Fl_Flex *flex;
     Fl_Box *title;
     Fl_Box *copyright;
     Fl_Box *version;
@@ -66,23 +68,26 @@ namespace About
 
   void init()
   {
-    int y1 = 8;
-
-    Items::dialog = new DialogWindow(384, 0, "About");
-    Items::title = new Fl_Box(FL_NO_BOX, 0, 8, 384, 32, "JoeClient");
+    Items::dialog = new DialogWindow(384, 128, "About");
+    Items::flex = new Fl_Flex(8, 8,
+                              Items::dialog->w() - 16, Items::dialog->h() - 16,
+                              Fl_Flex::VERTICAL);
+    Items::title = new Fl_Box(FL_NO_BOX, 0, 0, 0, 0, "JoeClient");
     Items::title->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
     Items::title->labelsize(24);
     Items::title->labelfont(FL_HELVETICA_BOLD);
-    y1 += 48;
-    Items::copyright = new Fl_Box(FL_FLAT_BOX, 0, y1, 384, 32,
+
+    Items::flex->gap(8);
+    Items::copyright = new Fl_Box(FL_FLAT_BOX, 0, 0, 0, 0,
                                   "Copyright (c) 2026 Joe Davisson");
     Items::copyright->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
     Items::copyright->labelsize(16);
-    y1 += 24;
-    Items::version = new Fl_Box(FL_FLAT_BOX, 0, y1, 384, 32, PACKAGE_STRING);
+    Items::version = new Fl_Box(FL_FLAT_BOX, 0, 0, 0, 0, PACKAGE_STRING);
     Items::version->align(FL_ALIGN_INSIDE | FL_ALIGN_TOP);
     Items::version->labelsize(16);
-    y1 += 24;
+    Items::flex->end();
+
+    int y1 = Items::flex->h();
     Items::dialog->addOkButton(&Items::ok, &y1);
     Items::ok->callback((Fl_Callback *)close);
     Items::dialog->set_modal();
@@ -95,6 +100,8 @@ namespace Connect
   namespace Items
   {
     DialogWindow *dialog;
+    Fl_Flex *flex1;
+    Fl_Flex *flex2;
     Fl_Input *address;
     Fl_Int_Input *port;
     CheckBox *enable_ssl;
@@ -130,28 +137,37 @@ namespace Connect
 
   void init()
   {
-    int y1 = 16;
+    Items::dialog = new DialogWindow(480, 300, "Connect to Server");
 
-    Items::dialog = new DialogWindow(480, 0, "Connect to Server");
-    Items::address = new Fl_Input(112, y1, 192, 24, "Address: ");
-    Items::address->align(FL_ALIGN_LEFT);
+    Items::flex1 = new Fl_Flex(8, 32,
+                              Items::dialog->w() - 16, 32,
+                              Fl_Flex::HORIZONTAL);
+    Items::flex1->gap(8);
+    Items::address = new Fl_Input(0, 0, 0, 0, "Address: ");
+    Items::address->align(FL_ALIGN_TOP_LEFT);
     Items::address->value("localhost");
     Items::address->textsize(20);
     Items::address->labelsize(18);
-    Items::port = new Fl_Int_Input(388, y1, 64, 24, "Port: ");
-    Items::port->align(FL_ALIGN_LEFT);
+    Items::port = new Fl_Int_Input(0, 0, 0, 0, "Port: ");
+    Items::port->align(FL_ALIGN_TOP_LEFT);
     Items::port->value("6666");
     Items::port->textsize(20);
     Items::port->labelsize(18);
-    y1 += 40;
-    Items::enable_ssl = new CheckBox(Items::dialog, 128, y1, 24, 24, "SSL", 0);
+    Items::flex1->end();
+
+    Items::flex2 = new Fl_Flex(8, Items::flex1->y() + Items::flex1->h() + 16,
+                              Items::dialog->w() - 16, 32,
+                              Fl_Flex::HORIZONTAL);
+    Items::enable_ssl = new CheckBox(Items::dialog, 0, 0, 0, 0, "SSL", 0);
     Items::enable_ssl->value(0);
     Items::enable_ssl->labelsize(18);
-    Items::keep_alive = new CheckBox(Items::dialog, 240, y1, 24, 24,
+    Items::keep_alive = new CheckBox(Items::dialog, 0, 0, 0, 0,
                                      "Keep Alive", 0);
     Items::keep_alive->value(0);
     Items::keep_alive->labelsize(18);
-    y1 += 40;
+    Items::flex2->end();
+
+    int y1 = Items::flex2->y() + Items::flex2->h() + 16;
     Items::dialog->addOkCancelButtons(&Items::ok, &Items::cancel, &y1);
     Items::ok->callback((Fl_Callback *)close);
     Items::cancel->callback((Fl_Callback *)quit);

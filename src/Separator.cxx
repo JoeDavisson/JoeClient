@@ -36,6 +36,6 @@ Separator::~Separator()
 
 void Separator::draw()
 {
-  fl_draw_box(FL_THIN_DOWN_FRAME, x(), y(), w(), h(), FL_BLACK); 
+  fl_rectf(x(), y() + h() / 2, w(), 2, FL_SELECTION_COLOR); 
 }
 

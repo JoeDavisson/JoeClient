@@ -38,8 +38,9 @@ void DialogWindow::addOkButton(Fl_Button **ok, int *y1)
 {
   new Separator(this, 4, *y1, w() - 8, 2, "");
   *y1 += 8;
-  *ok = new Fl_Button(w() - 72 - 8, *y1, 72, 32, "OK");
+  *ok = new Fl_Button(w() - 72 - 8, *y1, 72, 32, "Ok");
   (*ok)->labelsize(18);
+  (*ok)->shortcut(FL_Enter);
   add(*ok);
   *y1 += 32 + 8;
   resize(x(), y(), w(), *y1);
@@ -49,13 +50,14 @@ void DialogWindow::addOkCancelButtons(Fl_Button **ok, Fl_Button **cancel, int *y
 {
   new Separator(this, 4, *y1, w() - 8, 2, "");
   *y1 += 8;
+  *ok = new Fl_Button(w() - 72 - 72 - 16, *y1, 72, 32, "Ok");
+  (*ok)->labelsize(18);
+  (*ok)->shortcut(FL_Enter);
+  add(*ok);
   *cancel = new Fl_Button(w() - 72 - 8, *y1, 72, 32, "Cancel");
   (*cancel)->labelsize(18);
   add(*cancel);
-  *ok = new Fl_Button((*cancel)->x() - 64 - 8, *y1, 64, 32, "Ok");
-  (*ok)->labelsize(18);
   *y1 += 32 + 8;
-  add(*ok);
   resize(x(), y(), w(), *y1);
 }
 

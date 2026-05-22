@@ -34,6 +34,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include "Chat.H"
 #include "Dialog.H"
 #include "Gui.H"
+#include "Language.H"
 #include "StyledText.H"
 #include "UrlBrowse.H"
 
@@ -187,6 +188,7 @@ void Gui::init()
   menubar->box(FL_UP_BOX);
   menubar->textsize(16);
 
+/*
   menubar->add("&Server/&Connect...", 0,
     (Fl_Callback *)Dialog::connectToServer, 0, 0);
   menubar->add("&Server/&Disconnect", 0,
@@ -211,9 +213,35 @@ void Gui::init()
 
   setMenuItem("&Preferences/&Theme/&Light");
   setMenuItem("&Preferences/&Font Size/&Medium");
+*/
 
-  menubar->add("&Help/&About", 0,
-    (Fl_Callback *)Dialog::about, 0, 0);
+  menubar->add(Language::get(Language::SERVER_CONNECT),
+    0, (Fl_Callback *)Dialog::connectToServer, 0, 0);
+  menubar->add(Language::get(Language::SERVER_DISCONNECT),
+    0, (Fl_Callback *)Chat::userDisconnected, 0, FL_MENU_DIVIDER);
+  menubar->add(Language::get(Language::SERVER_CLEAR_WEB_LINKS),
+    0, (Fl_Callback *)clearURLs, 0, 0);
+  menubar->add(Language::get(Language::SERVER_CLEAR_PRIVATE_MESSAGES),
+    0, (Fl_Callback *)clearPMs, 0, FL_MENU_DIVIDER);
+  menubar->add(Language::get(Language::SERVER_QUIT),
+    0, (Fl_Callback *)quit, 0, 0);
+
+  menubar->add(Language::get(Language::PREFERENCES_THEME_LIGHT),
+    0, (Fl_Callback *)setLightTheme, 0, FL_MENU_RADIO);
+  menubar->add(Language::get(Language::PREFERENCES_THEME_DARK),
+    0, (Fl_Callback *)setDarkTheme, 0, FL_MENU_RADIO);
+  menubar->add(Language::get(Language::PREFERENCES_FONT_SIZE_SMALL),
+    0, (Fl_Callback *)setFontSmall, 0, FL_MENU_RADIO);
+  menubar->add(Language::get(Language::PREFERENCES_FONT_SIZE_MEDIUM),
+    0, (Fl_Callback *)setFontMedium, 0, FL_MENU_RADIO);
+  menubar->add(Language::get(Language::PREFERENCES_FONT_SIZE_LARGE),
+    0, (Fl_Callback *)setFontLarge, 0, FL_MENU_RADIO);
+
+  setMenuItem(Language::get(Language::PREFERENCES_THEME_LIGHT));
+  setMenuItem(Language::get(Language::PREFERENCES_FONT_SIZE_MEDIUM));
+
+  menubar->add(Language::get(Language::HELP_ABOUT),
+    0, (Fl_Callback *)Dialog::about, 0, 0);
 
   // vertical group
   vertical = new Fl_Tile(0, menubar->h(),
@@ -290,7 +318,8 @@ void Gui::init()
   setFontMedium();
   setLightTheme();
   clearURLs();
-  Gui::deactivateMenuItem("&Server/&Disconnect");
+//  Gui::deactivateMenuItem("&Server/&Disconnect");
+  Gui::deactivateMenuItem(Language::get(Language::SERVER_DISCONNECT));
 }
 
 // show the main program window (called after gui is constructed)

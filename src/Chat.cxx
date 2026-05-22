@@ -42,6 +42,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 #include "Chat.H"
 #include "Dialog.H"
+#include "Language.H"
 #include "Gui.H"
 
 #define MAX_USERS 256
@@ -151,7 +152,7 @@ namespace
 
         // check for url
         char *url_start = 0, *url_end = 0;
-        const char non_url_chars[] = "\r\n \"<>#{}|\\^`";
+        const char non_url_chars[] = "\r\n \"<>{}|\\^`";
 
         if (((url_start = strstr(current, "http://")) != 0) ||
            ((url_start = strstr(current, "https://")) != 0))
@@ -310,8 +311,10 @@ void Chat::connectToServer(const char *address, const int port,
   }
 #endif
 
-  Gui::deactivateMenuItem("&Server/&Connect...");
-  Gui::activateMenuItem("&Server/&Disconnect");
+//  Gui::deactivateMenuItem("&Server/&Connect...");
+//  Gui::activateMenuItem("&Server/&Disconnect");
+  Gui::deactivateMenuItem(Language::get(Language::SERVER_CONNECT));
+  Gui::activateMenuItem(Language::get(Language::SERVER_DISCONNECT));
 
   connected = true;
   enable_ssl = enable_ssl_value;
@@ -396,8 +399,10 @@ void Chat::disconnect(const char *title, const char *message)
     close(sock);
 #endif
 
-    Gui::activateMenuItem("&Server/&Connect...");
-    Gui::deactivateMenuItem("&Server/&Disconnect");
+//    Gui::activateMenuItem("&Server/&Connect...");
+//    Gui::deactivateMenuItem("&Server/&Disconnect");
+    Gui::activateMenuItem(Language::get(Language::SERVER_CONNECT));
+    Gui::deactivateMenuItem(Language::get(Language::SERVER_DISCONNECT));
 
     connected = false;
     Dialog::message(title, message);

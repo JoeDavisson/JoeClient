@@ -45,6 +45,7 @@ OBJ= \
   $(SRC_DIR)/CheckBox.o \
   $(SRC_DIR)/Dialog.o \
   $(SRC_DIR)/DialogWindow.o \
+  $(SRC_DIR)/Language.o \
   $(SRC_DIR)/Gui.o \
   $(SRC_DIR)/Separator.o \
   $(SRC_DIR)/StyledText.o \

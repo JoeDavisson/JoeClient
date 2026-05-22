@@ -68,7 +68,8 @@ namespace About
 
   void init()
   {
-    Items::dialog = new DialogWindow(384, 128, "About");
+    Items::dialog = new DialogWindow(384, 128,
+                                     Language::get(Language::ABOUT));
     Items::flex = new Fl_Flex(8, 8,
                               Items::dialog->w() - 16, Items::dialog->h() - 16,
                               Fl_Flex::VERTICAL);
@@ -137,18 +138,21 @@ namespace Connect
 
   void init()
   {
-    Items::dialog = new DialogWindow(480, 300, "Connect to Server");
+    Items::dialog = new DialogWindow(480, 300,
+                                   Language::get(Language::CONNECT_TO_SERVER));
 
     Items::flex1 = new Fl_Flex(8, 32,
                               Items::dialog->w() - 16, 32,
                               Fl_Flex::HORIZONTAL);
     Items::flex1->gap(8);
-    Items::address = new Fl_Input(0, 0, 0, 0, "Address: ");
+    Items::address = new Fl_Input(0, 0, 0, 0,
+                                  Language::get(Language::CONNECT_ADDRESS));
     Items::address->align(FL_ALIGN_TOP_LEFT);
     Items::address->value("localhost");
     Items::address->textsize(20);
     Items::address->labelsize(18);
-    Items::port = new Fl_Int_Input(0, 0, 0, 0, "Port: ");
+    Items::port = new Fl_Int_Input(0, 0, 0, 0,
+                                   Language::get(Language::CONNECT_PORT));
     Items::port->align(FL_ALIGN_TOP_LEFT);
     Items::port->value("6666");
     Items::port->textsize(20);
@@ -161,8 +165,10 @@ namespace Connect
     Items::enable_ssl = new CheckBox(Items::dialog, 0, 0, 0, 0, "SSL", 0);
     Items::enable_ssl->value(0);
     Items::enable_ssl->labelsize(18);
-    Items::keep_alive = new CheckBox(Items::dialog, 0, 0, 0, 0,
-                                     "Keep Alive", 0);
+    Items::keep_alive = new CheckBox(Items::dialog,
+                                 0, 0, 0, 0,
+                                 Language::get(Language::CONNECT_KEEP_ALIVE),
+                                 0);
     Items::keep_alive->value(0);
     Items::keep_alive->labelsize(18);
     Items::flex2->end();
@@ -260,8 +266,8 @@ namespace Choice
     Items::box->labelsize(16); 
     y1 += 64;
     Items::dialog->addOkCancelButtons(&Items::ok, &Items::cancel, &y1);
-    Items::ok->copy_label("Yes");
-    Items::cancel->copy_label("No");
+    Items::ok->copy_label(Language::get(Language::YES));
+    Items::cancel->copy_label(Language::get(Language::NO));
     Items::ok->callback((Fl_Callback *)close);
     Items::cancel->callback((Fl_Callback *)quit);
     Items::dialog->set_modal();

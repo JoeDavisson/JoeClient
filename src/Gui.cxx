@@ -64,7 +64,8 @@ namespace
   // quit program
   void quit()
   {
-    if (Dialog::choice("Quit", "Are You Sure?"))
+    if (Dialog::choice(Language::get(Language::QUIT),
+                       Language::get(Language::ARE_YOU_SURE)))
     {
       exit(0);
     }

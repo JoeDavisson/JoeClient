@@ -41,7 +41,9 @@ int main(/*int argc, char *argv[]*/)
 
   // program inits
   Language::set(Language::ENGLISH);
+//  Language::set(Language::GERMAN);
 //  Language::set(Language::SWEDISH);
+
   SSL_library_init();
   Dialog::init();
   Gui::init();

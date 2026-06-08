@@ -34,8 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
   #include <arpa/inet.h>
   #include <sys/socket.h>
   #include <netdb.h>
-  #define INVALID_SOCKET 0
-  #define SOCKET_ERROR -1
 #endif
 
 #include <FL/Fl.H>
@@ -51,9 +49,12 @@ namespace
 {
 #ifdef WIN32
   WSADATA wsa_data;
+//  SOCKET sock;
+//
+//#else
 #endif
-
   int sock;
+
   struct sockaddr_in server;
   struct addrinfo *ip_info;
   struct addrinfo hints;
@@ -173,7 +174,7 @@ namespace
           url_end = &current[j];
 
           const int length = url_end - url_start;
-          strlcpy(url_buf.data(), url_start, length + 1);
+          snprintf(url_buf.data(), length + 1, "%s", url_start);
 
           for (j = 0; j < strlen(current); j++)
           {
@@ -249,6 +250,7 @@ void Chat::connectToServer(const char *address, const int port,
   {
 #ifdef WIN32
     WSACleanup();
+    return;
 #endif
     Dialog::message("Error", "Could not obtain IP address.");
     return;
@@ -268,32 +270,30 @@ void Chat::connectToServer(const char *address, const int port,
   {
     sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 
-    if (sock == INVALID_SOCKET)
-    {
-      Dialog::message("Error", "Could not open socket.");
-#ifdef WIN32
-      WSACleanup();
-#endif
-      return;
-    }
+    if (sock == -1)
+      continue;
 
     if (connect(sock, (struct sockaddr *)&server,
-               sizeof(server)) == SOCKET_ERROR)
+                sizeof(server)) == -1)
     {
 #ifdef WIN32
       closesocket(sock);
 #else
       close(sock);
 #endif
-      sock = (int)INVALID_SOCKET;
-      continue;
+      sock = 0;
+      break;
     }
   }
 
-  if (sock == INVALID_SOCKET)
+  if (ip_info)
+    freeaddrinfo(ip_info);
+
+  if (sock == 0)
   {
 #ifdef WIN32
-      WSACleanup();
+    WSACleanup();
+    return;
 #endif
     Dialog::message("Error", "Could not connect.");
     return;
@@ -301,7 +301,7 @@ void Chat::connectToServer(const char *address, const int port,
 
 // set non-blocking mode on Windows
 #ifdef WIN32
-  u_long mode = 1;
+  unsigned long int mode = 1;
 
   if (ioctlsocket(sock, FIONBIO, &mode) != NO_ERROR)
   {
@@ -311,8 +311,6 @@ void Chat::connectToServer(const char *address, const int port,
   }
 #endif
 
-//  Gui::deactivateMenuItem("&Server/&Connect...");
-//  Gui::activateMenuItem("&Server/&Disconnect");
   Gui::deactivateMenuItem(Language::get(Language::SERVER_CONNECT));
   Gui::activateMenuItem(Language::get(Language::SERVER_DISCONNECT));
 
@@ -341,14 +339,43 @@ void Chat::connectToServer(const char *address, const int port,
       return;
     }
 
+#ifdef WIN32
+    const int found_cert = SSL_CTX_load_verify_locations(ctx,
+                                                         "cacert.pem",
+                                                         NULL);
+    if (found_cert == 0)
+    {
+      Chat::disconnect("Error",
+                       "Could not load certificate file (cacert.pem).");
+      return;
+    }
+#endif
+
     SSL_set_fd(ssl, sock);
 
-    int ssl_connect = SSL_connect(ssl);
+    int ssl_connect = 0;
+    int timeout = 10;
 
-    if (ssl_connect != 1)
+    while (true)
     {
-      Chat::disconnect("Error", "Server does not support SSL.");
-      return;
+      ssl_connect = SSL_connect(ssl);
+
+      if (ssl_connect == 1)
+        break;
+
+#ifdef WIN32
+      Sleep(1000);
+#else
+      usleep(1000 * 1000);
+#endif
+
+      timeout--;
+
+      if (timeout == 0)
+      {
+        Chat::disconnect("Error", "Server does not support SSL.");
+        return;
+      }
     }
   }
 
@@ -399,8 +426,6 @@ void Chat::disconnect(const char *title, const char *message)
     close(sock);
 #endif
 
-//    Gui::activateMenuItem("&Server/&Connect...");
-//    Gui::deactivateMenuItem("&Server/&Disconnect");
     Gui::activateMenuItem(Language::get(Language::SERVER_CONNECT));
     Gui::deactivateMenuItem(Language::get(Language::SERVER_DISCONNECT));
 
@@ -464,7 +489,8 @@ void Chat::addUser(int line, const char *name)
 {
   if (line >= 0 && line < MAX_USERS)
   {
-    strlcpy(user_list[line].name.data(), name, user_list[line].name.size());
+    snprintf(user_list[line].name.data(),
+             user_list[line].name.size(), "%s", name);
     user_list[line].active = true;
 
     Gui::clearUsers();

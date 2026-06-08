@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 */
 
 #include "FL/Fl.H"
+#include "FL/Fl_Cairo.H"
 
 #include <csignal>
 #include <openssl/ssl.h>
@@ -27,8 +28,16 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 #include "Gui.H"
 #include "Language.H"
 
+#ifndef WIN32
+  FL_EXPORT bool fl_disable_wayland = true;
+#endif
+
 int main(/*int argc, char *argv[]*/)
 {
+  Fl::cairo_autolink_context(true);
+  SSL_load_error_strings();
+  OpenSSL_add_ssl_algorithms();
+
   Fl::scheme("gtk+");
   Fl::screen_scale(0, 1.0);
 

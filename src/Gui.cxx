@@ -182,6 +182,7 @@ void Gui::init()
 {
   // main window
   window = new MainWin(800, 600, "JoeClient");
+  window->xclass("JoeClient");
   window->callback(closeCallback);
 
   // generate menu

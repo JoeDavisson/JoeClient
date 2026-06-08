@@ -6,37 +6,34 @@
 # libxft-dev should be installed before compiling FLTK on linux
 # (otherwise you'll have ugly, non-resizable fonts)
 
+# The Windows version is built with mingw, and needs OpenSSL compiled for it.
+
 FLTK_DIR=fltk-1.4.5
 PLATFORM=linux
-#PLATFORM=mingw32
 #PLATFORM=mingw64
 
 VERSION=0.1.5
 SRC_DIR=src
 INCLUDE=-I$(SRC_DIR) -I$(FLTK_DIR)
-LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-images --ldstaticflags)
-LIBS+=-lssl -lcrypto
 
 ifeq ($(PLATFORM),linux)
+  LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-cairo --use-images --ldstaticflags)
   HOST=
   CXX=g++
-  CXXFLAGS= -O3 -Wall -Wunused-parameter -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
+  CXXFLAGS=$(shell pkg-config --cflags cairo)
+  CXXFLAGS+=-O3 -Wall -Wunused-parameter -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
+  LIBS+=-lssl -lcrypto
   EXE=joeclient
 endif
 
-ifeq ($(PLATFORM),mingw32)
-  HOST=i686-w64-mingw32
-  CXX=$(HOST)-g++
-  CXXFLAGS= -O3 -Wall -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
-  LIBS+=-lgdi32 -lcomctl32 -static -lpthread
-  EXE=joeclient.exe
-endif
-
 ifeq ($(PLATFORM),mingw64)
+  LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-images --ldstaticflags)
   HOST=x86_64-w64-mingw32
   CXX=$(HOST)-g++
-  CXXFLAGS= -O3 -Wall -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
-  LIBS+=-lgdi32 -lcomctl32 -static -lpthread
+  INCLUDE+=-I/usr/local/mingw64/openssl/include
+  LIBS+=-L/usr/local/mingw64/openssl/lib64
+  LIBS+=-lssl -lcrypto -lws2_32 -lgdi32 -lcomctl32 -lcrypt32 -static -lpthread
+  CXXFLAGS= -O3 -Wall -Wunused-parameter -static-libgcc -static-libstdc++ -DPACKAGE_STRING=\"$(VERSION)\" $(INCLUDE)
   EXE=joeclient.exe
 endif
 
@@ -60,8 +57,8 @@ default: $(OBJ)
 fltklib:
 	cd ./$(FLTK_DIR); \
 	make clean; \
-	./configure --host=$(HOST) --enable-usecairo --enable-pango --enable-xft --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
-	make -j12; \
+	./configure --host=$(HOST) --enable-cairo --enable-cairoext --enable-usecairo --enable-pango --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
+	make -j6; \
 	cd ..; \
 	echo "FLTK lib built.";
 

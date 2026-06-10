@@ -49,60 +49,6 @@ namespace
     "No"
   };
 
-  const char *german[64] =
-  {
-    "Der Server/Verbinden",
-    "Der Server/Trennen",
-    "Der Server/Links zum Clear Web",
-    "Der Server/Private Nachrichten Löschen",
-    "Der Server/Aufhören",
-    "Einstellungen/Thema/Licht",
-    "Einstellungen/Thema/Dunkel",
-    "Einstellungen/Schriftgröße/Klein",
-    "Eserverinstellungen/Schriftgröße/Medium",
-    "Einstellungen/Schriftgröße/Groß",
-    "Helfen",
-    "Über",
-    "Helfen/Über",
-    "Verbindung Zum Server Herstellen",
-    "Adresse",
-    "Port",
-    "Keep-Alive",
-    "Aufhören",
-    "Bist Du Sicher?",
-    "Ok",
-    "Abbrechen",
-    "Ja",
-    "Nein"
-  };
-
-  const char *swedish[64] =
-  {
-    "Server/Ansluta",
-    "Server/Stänga Av",
-    "Server/Tydliga Webblänkar",
-    "Server/Rensa Privata Meddelanden",
-    "Server/Lämna",
-    "Preferenser/Thema/Licht",
-    "Preferenser/Thema/Dunkel",
-    "Preferenser/Fontstorlek/Liten",
-    "Preferenser/Fontstorlek/Medium",
-    "Preferenser/Fontstorlek/Stor",
-    "Hjälp",
-    "Om",
-    "Hjälp/Om",
-    "Ansluta Till Servern",
-    "Adress",
-    "Port",
-    "Keep-Alive",
-    "Lämna",
-    "Är du säker?",
-    "Ok",
-    "Avboka",
-    "Ja",
-    "Nej"
-  };
-
   char **text = (char **)english;
 }
 
@@ -111,13 +57,8 @@ void Language::set(const int x)
   switch (x)
   {
     case ENGLISH:
+    default:
       text = (char **)english;
-      break;
-    case GERMAN:
-      text = (char **)german;
-      break;
-    case SWEDISH:
-      text = (char **)swedish;
       break;
   }
 }

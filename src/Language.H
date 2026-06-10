@@ -26,9 +26,7 @@ class Language
 public:
   enum
   {
-    ENGLISH,
-    GERMAN,
-    SWEDISH
+    ENGLISH
   };
 
   enum

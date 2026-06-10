@@ -6,8 +6,6 @@
 # libxft-dev should be installed before compiling FLTK on linux
 # (otherwise you'll have ugly, non-resizable fonts)
 
-# The Windows version is built with mingw, and needs OpenSSL compiled for it.
-
 FLTK_DIR=fltk-1.4.5
 PLATFORM=linux
 #PLATFORM=mingw64
@@ -17,7 +15,7 @@ SRC_DIR=src
 INCLUDE=-I$(SRC_DIR) -I$(FLTK_DIR)
 
 ifeq ($(PLATFORM),linux)
-  LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-cairo --use-images --ldstaticflags)
+  LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-cairo --ldstaticflags)
   HOST=
   CXX=g++
   CXXFLAGS=$(shell pkg-config --cflags cairo)
@@ -27,7 +25,7 @@ ifeq ($(PLATFORM),linux)
 endif
 
 ifeq ($(PLATFORM),mingw64)
-  LIBS=$(shell ./$(FLTK_DIR)/fltk-config --use-images --ldstaticflags)
+  LIBS=$(shell ./$(FLTK_DIR)/fltk-config --ldstaticflags)
   HOST=x86_64-w64-mingw32
   CXX=$(HOST)-g++
   INCLUDE+=-I/usr/local/mingw64/openssl/include
@@ -58,7 +56,7 @@ fltklib:
 	cd ./$(FLTK_DIR); \
 	make clean; \
 	./configure --host=$(HOST) --enable-cairo --enable-cairoext --enable-usecairo --enable-pango --enable-localjpeg --enable-localzlib --enable-localpng --disable-xdbe; \
-	make -j6; \
+	make -j20; \
 	cd ..; \
 	echo "FLTK lib built.";
 
